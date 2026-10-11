@@ -59,19 +59,60 @@ jobs:
             exit 1
           fi
           source build/envsetup.sh
-          lunch twrp_lxx521-userdebug || lunch twrp_lxx521-eng
 
-          export COMBINED_OUT_DIR=out
+          echo "========= DEVICE TREE DIAGNOSTIC ========="
+          ls -la device/lava/lxx521/ || true
+          echo "--- AndroidProducts.mk ---"
+          cat device/lava/lxx521/AndroidProducts.mk 2>/dev/null || echo "MISSING"
+          echo "--- vendorsetup.sh ---"
+          cat device/lava/lxx521/vendorsetup.sh 2>/dev/null || echo "MISSING"
+          echo "--- *.mk files ---"
+          ls device/lava/lxx521/*.mk 2>/dev/null || true
+          echo "=========================================="
+
+          LUNCHED=false
+          for combo in \
+            "twrp_lxx521-ap3a-eng" \
+            "twrp_lxx521-ap3a-userdebug" \
+            "twrp_lxx521-eng" \
+            "twrp_lxx521-userdebug" \
+            "omni_lxx521-eng" \
+            "omni_lxx521-userdebug" \
+            "lineage_lxx521-eng" \
+            "lineage_lxx521-userdebug" \
+            "lxx521-eng" \
+            "lxx521-userdebug" \
+            "full_lxx521-eng" \
+            "full_lxx521-userdebug"; do
+            echo ">>> Attempting: lunch $combo"
+            if lunch "$combo" >/tmp/lunch_attempt.log 2>&1; then
+              echo "✅ SUCCESS: lunch $combo"
+              LUNCHED=true
+              break
+            else
+              tail -2 /tmp/lunch_attempt.log || true
+            fi
+          done
+
+          if [ "$LUNCHED" = false ]; then
+            echo "❌ ALL LUNCH COMBOS FAILED."
+            echo "Listing available lunch targets (if any):"
+            (lunch 2>&1 | head -100) || true
+            echo "---- AndroidProducts.mk again ----"
+            cat device/lava/lxx521/AndroidProducts.mk || echo "no file"
+            exit 1
+          fi
+
           mka recoveryimage vendor_boot -j2 showcommands || make recoveryimage vendor_boot -j2 showcommands
 
           mkdir -p output
           find out/ -type f -name "*.img" -exec cp -v {} output/ \; 2>/dev/null || true
 
-          echo "=== Generated Output Images Found ==="
+          echo "=== Generated Output Images ==="
           ls -la output/
 
           if [ -z "$(ls -A output/)" ]; then
-            echo "ERROR: No .img files found anywhere in out/ directory!"
+            echo "ERROR: No .img files found anywhere in out/"
             exit 1
           fi
 
