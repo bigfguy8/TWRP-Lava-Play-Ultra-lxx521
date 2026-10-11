@@ -2,123 +2,361 @@ name: Build TWRP Custom Recovery
 
 on:
   workflow_dispatch:
+    inputs:
+      lunch_release:
+        description: "Verified lunch release; leave blank for safe discovery"
+        required: false
+        default: ""
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: twrp-lxx521-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   build:
     name: Build TWRP for Lava Play Ultra 5G (lxx521)
     runs-on: ubuntu-22.04
-    permissions:
-      contents: write
+    timeout-minutes: 330
 
-    steps:
+defaults:
+      run:
+        shell: bash
+
+env:
+      DEVICE_PATH: device/lava/lxx521
+      PRODUCT: twrp_lxx521
+      REQUESTED_RELEASE: ${{ inputs.lunch_release }}
+
+steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: false
 
-      - name: Maximize Runner Disk Space
+- name: Prepare Workspace and Disk
         run: |
-          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL /usr/local/share/boost
-          sudo apt-get clean
+          set -eo pipefail
+          mkdir -p workspace/diagnostics workspace/output
 
-      - name: Install Build Dependencies
+echo "=== Disk before cleanup ==="
+          df -h .
+
+sudo rm -rf \
+            /usr/share/dotnet \
+            /usr/local/lib/android \
+            /opt/ghc \
+            /opt/hostedtoolcache/CodeQL \
+            /usr/local/share/boost
+
+sudo apt-get clean
+
+echo "=== Disk after cleanup ==="
+          df -h .
+
+- name: Install Build Dependencies
         run: |
+          set -eo pipefail
           sudo apt-get update
           sudo apt-get install -y \
-            gawk flex bison build-essential ccache curl git-core \
+            gawk flex bison build-essential ccache curl git \
             git-lfs gnupg gperf lib32ncurses5-dev lib32z1-dev \
             libffi-dev libgl1-mesa-dev libxml2-utils xsltproc \
             zlib1g-dev python3 python3-pip openjdk-11-jdk \
-            zip unzip libssl-dev bc libelf-dev lzop rsync schedtool
+            zip unzip libssl-dev bc libelf-dev lzop \
+            rsync schedtool lz4
 
-      - name: Install Repo Tool
-        run: |
-          mkdir -p ~/bin
-          curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
-          chmod a+rx ~/bin/repo
-          echo "$HOME/bin" >> $GITHUB_PATH
+git lfs install --skip-repo
 
-      - name: Initialize and Sync TWRP Manifest
+- name: Install Repo Tool
         run: |
-          mkdir -p workspace
-          cd workspace
-          git config --global user.name "GitHub Actions"
+          set -eo pipefail
+          mkdir -p "$HOME/bin"
+
+curl --fail --location --retry 3 \
+            https://storage.googleapis.com/git-repo-downloads/repo \
+            -o "$HOME/bin/repo"
+
+test -s "$HOME/bin/repo"
+          chmod 0755 "$HOME/bin/repo"
+          echo "$HOME/bin" >> "$GITHUB_PATH"
+
+- name: Initialize and Sync TWRP Manifest
+        working-directory: workspace
+        run: |
+          set -eo pipefail
+          exec > >(tee -a diagnostics/sync.log) 2>&1
+
+git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
-          repo init -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b twrp-14 --depth=1
-          repo sync -c -j4 --force-sync --no-clone-bundle --no-tags --optimized-fetch --prune
 
-      - name: Clone Device and Kernel Trees
+repo init \
+            -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git \
+            -b twrp-14 \
+            --depth=1
+
+repo sync \
+            -c -j4 \
+            --force-sync \
+            --no-clone-bundle \
+            --no-tags \
+            --optimized-fetch \
+            --prune
+
+repo manifest -r -o diagnostics/resolved-manifest.xml
+
+- name: Clone Device and Kernel Trees
         working-directory: workspace
         run: |
-          git clone https://github.com/fahimfrk/Dimensity7300-Device-Tree-Lava-Play-Ultra device/lava/lxx521 --depth=1
-          git clone https://github.com/SiliconxLab/android_device_lava_lxx521-kernel -b lineage-23.2 device/lava/lxx521-kernel --depth=1
+          set -eo pipefail
+          exec > >(tee -a diagnostics/trees.log) 2>&1
 
-      - name: Build TWRP Image
+git clone --depth=1 \
+            https://github.com/fahimfrk/Dimensity7300-Device-Tree-Lava-Play-Ultra \
+            "$DEVICE_PATH"
+
+git clone --depth=1 --branch lineage-23.2 \
+            https://github.com/SiliconxLab/android_device_lava_lxx521-kernel \
+            device/lava/lxx521-kernel
+
+git -C "$DEVICE_PATH" lfs pull
+          git -C device/lava/lxx521-kernel lfs pull
+
+{
+            echo "=== Workflow commit ==="
+            printf '%s\n' "$GITHUB_SHA"
+
+echo "=== Manifest commit ==="
+            git -C .repo/manifests log -1 --format='%H %s'
+
+echo "=== Build/make commit ==="
+            git -C build/make log -1 --format='%H %s'
+
+echo "=== Device tree commit ==="
+            git -C "$DEVICE_PATH" log -1 --format='%H %s'
+
+echo "=== Kernel tree commit ==="
+            git -C device/lava/lxx521-kernel log -1 --format='%H %s'
+          } | tee diagnostics/source-revisions.txt
+
+- name: Configure and Build Vendor Boot Image
         working-directory: workspace
         run: |
-          if [ ! -f build/envsetup.sh ]; then
-            echo "Error: build/envsetup.sh not found."
-            exit 1
-          fi
-          source build/envsetup.sh
+          set -eo pipefail
+          exec > >(tee -a diagnostics/build.log) 2>&1
 
-          echo "========= DEVICE TREE DIAGNOSTIC ========="
-          ls -la device/lava/lxx521/ || true
-          echo "--- AndroidProducts.mk ---"
-          cat device/lava/lxx521/AndroidProducts.mk 2>/dev/null || echo "MISSING"
-          echo "--- vendorsetup.sh ---"
-          cat device/lava/lxx521/vendorsetup.sh 2>/dev/null || echo "MISSING"
-          echo "--- *.mk files ---"
-          ls device/lava/lxx521/*.mk 2>/dev/null || true
-          echo "=========================================="
+echo "=== Host environment ==="
+          pwd
+          printf 'Bash: %s\n' "$BASH_VERSION"
+          java -version
+          python3 --version
+          free -h
+          df -h .
 
-          LUNCHED=false
-          for combo in \
-            "twrp_lxx521-ap3a-eng" \
-            "twrp_lxx521-ap3a-userdebug" \
-            "twrp_lxx521-eng" \
-            "twrp_lxx521-userdebug" \
-            "omni_lxx521-eng" \
-            "omni_lxx521-userdebug" \
-            "lineage_lxx521-eng" \
-            "lineage_lxx521-userdebug" \
-            "lxx521-eng" \
-            "lxx521-userdebug" \
-            "full_lxx521-eng" \
-            "full_lxx521-userdebug"; do
-            echo ">>> Attempting: lunch $combo"
-            if lunch "$combo" >/tmp/lunch_attempt.log 2>&1; then
-              echo "✅ SUCCESS: lunch $combo"
-              LUNCHED=true
-              break
-            else
-              tail -2 /tmp/lunch_attempt.log || true
+echo "=== Required configuration files ==="
+          for file in \
+            build/envsetup.sh \
+            "$DEVICE_PATH/AndroidProducts.mk" \
+            "$DEVICE_PATH/twrp_lxx521.mk" \
+            "$DEVICE_PATH/BoardConfig.mk"; do
+            if [ ! -s "$file" ]; then
+              echo "::error::Required file is missing or empty: $file"
+              exit 1
             fi
           done
 
-          if [ "$LUNCHED" = false ]; then
-            echo "❌ ALL LUNCH COMBOS FAILED."
-            echo "Listing available lunch targets (if any):"
-            (lunch 2>&1 | head -100) || true
-            echo "---- AndroidProducts.mk again ----"
-            cat device/lava/lxx521/AndroidProducts.mk || echo "no file"
+mkdir -p diagnostics/device-config
+          cp "$DEVICE_PATH/"*.mk diagnostics/device-config/
+          if [ -f "$DEVICE_PATH/vendorsetup.sh" ]; then
+            cp "$DEVICE_PATH/vendorsetup.sh" diagnostics/device-config/
+          fi
+
+echo "=== Registered products ==="
+          cat "$DEVICE_PATH/AndroidProducts.mk"
+
+echo "=== Environment setup ==="
+          readlink -f build/envsetup.sh
+          sha256sum build/envsetup.sh
+          source build/envsetup.sh
+
+if ! declare -F lunch >/dev/null; then
+            echo "::error::Environment setup did not define lunch."
             exit 1
           fi
 
-          mka recoveryimage vendor_boot -j2 showcommands || make recoveryimage vendor_boot -j2 showcommands
+declare -f lunch > diagnostics/lunch-function.txt
 
-          mkdir -p output
-          find out/ -type f -name "*.img" -exec cp -v {} output/ \; 2>/dev/null || true
-
-          echo "=== Generated Output Images ==="
-          ls -la output/
-
-          if [ -z "$(ls -A output/)" ]; then
-            echo "ERROR: No .img files found anywhere in out/"
+if [ -n "$REQUESTED_RELEASE" ] &&
+             [[ ! "$REQUESTED_RELEASE" =~ ^[A-Za-z0-9_]+$ ]]; then
+            echo "::error::Release must contain only letters, digits, or underscores."
             exit 1
           fi
 
-      - name: Upload Output Artifacts
+SELECTED_COMBO=""
+
+if [ -n "$REQUESTED_RELEASE" ]; then
+            SELECTED_COMBO="$PRODUCT-$REQUESTED_RELEASE-eng"
+          else
+            echo "=== Test device tree's advertised lunch choice ==="
+            if lunch "$PRODUCT-eng" \
+                > diagnostics/lunch-initial.log 2>&1; then
+              cat diagnostics/lunch-initial.log
+              SELECTED_COMBO="$PRODUCT-eng"
+            else
+              cat diagnostics/lunch-initial.log
+
+if ! grep -Fq \
+                  '<product>-<release>-<variant>' \
+                  diagnostics/lunch-initial.log; then
+                echo "::error::Lunch failed for a reason other than three-part syntax."
+                exit 1
+              fi
+
+echo "=== Ask build system to report available releases ==="
+              # Intentionally invalid release: diagnostic probe only.
+              if lunch "$PRODUCT-__release_probe__-eng" \
+                  > diagnostics/lunch-release-probe.log 2>&1; then
+                echo "::error::Unexpected diagnostic release acceptance; stopping."
+                exit 1
+              fi
+              cat diagnostics/lunch-release-probe.log
+
+python3 - <<'PY'
+          import pathlib
+          import re
+          import sys
+
+log = pathlib.Path(
+              "diagnostics/lunch-release-probe.log"
+          ).read_text(errors="replace")
+          log = re.sub(r"\x1b\[[0-?]*[ -/]*[@-~]", "", log)
+
+patterns = (
+              r"Available releases(?: are)?\s*:\s*([^\r\n]+)",
+              r"where release is one of:\s*([^\r\n]+)",
+          )
+
+candidates = set()
+          for pattern in patterns:
+              for match in re.finditer(pattern, log, flags=re.IGNORECASE):
+                  text = match.group(1).strip().rstrip(".")
+                  tokens = re.split(r"[\s,]+", text)
+                  if tokens and all(
+                      re.fullmatch(r"[A-Za-z0-9_]+", token)
+                      for token in tokens
+                  ):
+                      candidates.update(tokens)
+
+print("Explicitly reported releases:", sorted(candidates))
+          if len(candidates) != 1:
+              print(
+                  "Cannot safely choose a release. Inspect lunch-release-probe.log "
+                  "and rerun with a verified lunch_release input.",
+                  file=sys.stderr,
+              )
+              sys.exit(1)
+
+pathlib.Path("diagnostics/discovered-release.txt").write_text(
+              next(iter(candidates)) + "\n"
+          )
+          PY
+
+RELEASE="$(cat diagnostics/discovered-release.txt)"
+              SELECTED_COMBO="$PRODUCT-$RELEASE-eng"
+            fi
+          fi
+
+echo "=== Final lunch: $SELECTED_COMBO ==="
+          if lunch "$SELECTED_COMBO" \
+              > diagnostics/lunch-final.log 2>&1; then
+            cat diagnostics/lunch-final.log
+          else
+            cat diagnostics/lunch-final.log
+            echo "::error::Final lunch failed; complete output is preserved."
+            exit 1
+          fi
+
+ACTUAL_PRODUCT="$(get_build_var TARGET_PRODUCT)"
+          if [ "$ACTUAL_PRODUCT" != "$PRODUCT" ]; then
+            echo "::error::Unexpected selected product: $ACTUAL_PRODUCT"
+            exit 1
+          fi
+
+PRODUCT_OUT="$(get_build_var PRODUCT_OUT)"
+          if [ -z "$PRODUCT_OUT" ] || [ "$PRODUCT_OUT" = "/" ]; then
+            echo "::error::Invalid product output directory."
+            exit 1
+          fi
+
+{
+            printf 'Lunch: %s\n' "$SELECTED_COMBO"
+            printf 'Product: %s\n' "$ACTUAL_PRODUCT"
+            printf 'Output directory: %s\n' "$PRODUCT_OUT"
+            printf 'Run: https://github.com/%s/actions/runs/%s\n' \
+              "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID"
+          } | tee diagnostics/selected-configuration.txt
+
+echo "=== Build vendorbootimage with two parallel jobs ==="
+          if declare -F mka >/dev/null; then
+            mka vendorbootimage -j2 showcommands
+          elif declare -F m >/dev/null; then
+            m vendorbootimage -j2 showcommands
+          else
+            echo "::error::Neither mka nor m is available."
+            exit 1
+          fi
+
+IMAGE="$PRODUCT_OUT/vendor_boot.img"
+          if [ ! -s "$IMAGE" ]; then
+            echo "::error::Expected final image missing or empty: $IMAGE"
+            exit 1
+          fi
+
+IMAGE_SIZE="$(stat -c '%s' "$IMAGE")"
+          PARTITION_SIZE="$(get_build_var BOARD_VENDOR_BOOTIMAGE_PARTITION_SIZE)"
+
+if [[ ! "$PARTITION_SIZE" =~ ^[0-9]+$ ]]; then
+            echo "::error::Cannot validate vendor_boot partition size."
+            exit 1
+          fi
+
+if [ "$IMAGE_SIZE" -gt "$PARTITION_SIZE" ]; then
+            echo "::error::Image exceeds the configured partition size."
+            exit 1
+          fi
+
+cp "$IMAGE" output/vendor_boot.img
+          cp diagnostics/source-revisions.txt output/
+          cp diagnostics/selected-configuration.txt output/
+          cp diagnostics/resolved-manifest.xml output/
+
+(
+            cd output
+            sha256sum vendor_boot.img > SHA256SUMS
+          )
+
+echo "=== Final output ==="
+          ls -lh output/
+          cat output/SHA256SUMS
+
+- name: Upload Diagnostics
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: TWRP-Lava-Play-Ultra-lxx521
-          path: workspace/output/*.img
+          name: lxx521-diagnostics-${{ github.run_id }}-${{ github.run_attempt }}
+          path: workspace/diagnostics/
+          if-no-files-found: warn
+          retention-days: 14
+
+- name: Upload Recovery Build
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: TWRP-lxx521-${{ github.run_id }}-${{ github.run_attempt }}
+          path: workspace/output/
           if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
