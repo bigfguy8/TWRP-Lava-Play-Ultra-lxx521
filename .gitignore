@@ -1,10 +1,14 @@
-# Large files
+# Large build artifacts
 *.img
 *.raw
-*.lz4
 *.zip
+*.lz4
 
-# Except tee files
+# Except stock files
+!stock-files/*.img
+!stock-files/*.lz4
+
+# Except TEE files
 !tee-files/**/*.ta
 !tee-files/**/*.so
 !tee-files/**/*.rc
