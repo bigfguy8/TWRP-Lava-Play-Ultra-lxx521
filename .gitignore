@@ -15,3 +15,8 @@
 !tee-files/**/*.xml
 !tee-files/bin/*
 !tee-files/bin-hw/*
+
+# Backup files
+*.backup
+*.bak
+main.yml.backup

@@ -1,0 +1,14 @@
+#!/usr/bin/env python3
+import sys, lz4.block
+infile, outfile = sys.argv[1], sys.argv[2]
+with open(infile, 'rb') as f:
+    data = f.read()
+output = bytearray(b'\x02\x21\x4c\x18')
+BLOCK = 8 * 1024 * 1024
+for i in range(0, len(data), BLOCK):
+    blk = data[i:i+BLOCK]
+    comp = lz4.block.compress(blk, mode='high_compression', compression=12, store_size=False)
+    output += len(comp).to_bytes(4, 'little') + comp
+with open(outfile, 'wb') as f:
+    f.write(output)
+print(f"LZ4: {len(output):,} bytes ({len(output)/1024/1024:.2f} MB)")
