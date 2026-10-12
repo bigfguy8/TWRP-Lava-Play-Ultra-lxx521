@@ -20,3 +20,8 @@
 *.backup
 *.bak
 main.yml.backup
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
