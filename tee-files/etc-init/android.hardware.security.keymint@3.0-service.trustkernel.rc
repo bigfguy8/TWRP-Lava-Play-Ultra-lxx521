@@ -1,0 +1,4 @@
+service vendor.keymint-3-0-trustkernel /vendor/bin/hw/android.hardware.security.keymint@3.0-service.trustkernel
+    class early_hal
+    user system
+    group system

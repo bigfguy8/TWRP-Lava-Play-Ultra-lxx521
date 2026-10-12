@@ -1,0 +1,13 @@
+# Large files
+*.img
+*.raw
+*.lz4
+*.zip
+
+# Except tee files
+!tee-files/**/*.ta
+!tee-files/**/*.so
+!tee-files/**/*.rc
+!tee-files/**/*.xml
+!tee-files/bin/*
+!tee-files/bin-hw/*
