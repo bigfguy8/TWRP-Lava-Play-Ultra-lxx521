@@ -1,0 +1,66 @@
+import /init.recovery.project.rc
+
+on init
+    setprop sys.usb.configfs 1
+    setprop sys.usb.controller "11201000.usb0"
+
+on fs && property:ro.debuggable=0
+    # USB charging handling
+
+on boot
+    exec u:r:update_engine:s0 root root -- /system/bin/mtk_plpath_utils
+    start adbd
+
+# ==================================================
+# TEE Support — TrustKernel for FBE Decryption (v1.5)
+# ==================================================
+
+# TrustKernel TEE Daemon — uses /tmp to avoid /data encryption
+service teed /vendor/bin/teed \
+    --tzdev /dev/tkcore_admin \
+    --datapath /tmp/vendor/t6/fs \
+    --sptapath /tmp/vendor/t6/app \
+    --systapath /vendor/app/t6 \
+    --rpmbdev /dev/rpmb0 \
+    --prot /mnt/vendor/persist/t6 \
+    --prot /mnt/vendor/protect_f/tee \
+    --prebuilt /vendor/app/t6/data \
+    --logpath /tmp/vendor/t6/tkcore.log \
+    --proprefix vendor.trustkernel
+        capabilities SYS_RAWIO
+        user system
+        group system
+        class core
+        disabled
+
+# KeyMint v3.0 HAL (Android 15)
+service vendor.keymint-3-0-trustkernel /vendor/bin/hw/android.hardware.security.keymint@3.0-service.trustkernel
+        class early_hal
+        user system
+        group system
+        disabled
+
+# Gatekeeper HAL
+service vendor.gatekeeper /vendor/bin/hw/android.hardware.gatekeeper-service.trustkernel
+        class hal
+        user system
+        group system
+        disabled
+
+# Setup TEE paths using /tmp (avoid encrypted /data)
+on early-init
+    mkdir /tmp/vendor 0770 system system
+    mkdir /tmp/vendor/t6 0770 system system
+    mkdir /tmp/vendor/t6/fs 0770 system system
+    mkdir /tmp/vendor/t6/app 0770 system system
+    mkdir /mnt/vendor/persist/t6 0770 system system
+    mkdir /mnt/vendor/protect_f/tee 0770 system system
+
+# Start TEE daemon on early-boot (before /data mount)
+on early-boot
+    start teed
+
+# Start HALs after TEE daemon ready
+on property:vendor.trustkernel.fs.state=ready
+    start vendor.keymint-3-0-trustkernel
+    start vendor.gatekeeper

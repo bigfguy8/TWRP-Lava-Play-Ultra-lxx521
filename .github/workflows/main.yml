@@ -142,6 +142,17 @@ jobs:
           chmod 755 $RAMDISK/vendor/bin/teed $RAMDISK/vendor/bin/tee_check_keybox
           chmod 755 $RAMDISK/vendor/bin/hw/*
           echo "TEE files: $(find $RAMDISK/vendor -type f | wc -l)"
+          
+          # Swap init.recovery if TEE version available
+          if [ -f "$TEE/etc-init/init.recovery.mt6878.rc.tee" ]; then
+            cp "$TEE/etc-init/init.recovery.mt6878.rc.tee" "$RAMDISK/init.recovery.mt6878.rc"
+            echo "init.recovery replaced with TEE version"
+            echo "New init.recovery size: $(stat -c '%s' "$RAMDISK/init.recovery.mt6878.rc") bytes"
+          else
+            echo "Using standard v1.1 init.recovery"
+          fi
+          
+
 
       - name: Repack CPIO
         run: |
