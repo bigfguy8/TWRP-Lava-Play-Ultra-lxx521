@@ -58,7 +58,7 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cpio bsdtar lz4 python3 python3-pip gawk flex bison build-essential ccache curl git git-lfs gnupg gperf lib32ncurses5-dev lib32z1-dev libffi-dev libgl1-mesa-dev libxml2-utils xsltproc zlib1g-dev openjdk-11-jdk zip unzip libssl-dev bc libelf-dev lzop rsync schedtool
+          sudo apt-get install -y cpio libarchive-tools lz4 python3 python3-pip gawk flex bison build-essential ccache curl git git-lfs gnupg gperf lib32ncurses5-dev lib32z1-dev libffi-dev libgl1-mesa-dev libxml2-utils xsltproc zlib1g-dev openjdk-11-jdk zip unzip libssl-dev bc libelf-dev lzop rsync schedtool
           pip install lz4
           cpio --version | head -1
 
@@ -217,7 +217,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install Tools
-        run: sudo apt-get update && sudo apt-get install -y bsdtar python3-pip && pip install lz4
+        run: sudo apt-get update && sudo apt-get install -y libarchive-tools python3-pip && pip install lz4
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
