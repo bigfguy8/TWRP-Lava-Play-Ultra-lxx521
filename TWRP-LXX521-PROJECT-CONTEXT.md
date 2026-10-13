@@ -160,3 +160,32 @@ git clone https://github.com/bigfguy8/TWRP-Lava-Play-Ultra-lxx521.git
 ## Community
 - Telegram: t.me/playultra5g
 - GitHub Issues: https://github.com/bigfguy8/TWRP-Lava-Play-Ultra-lxx521/issues
+
+---
+
+## v3.0 RELEASED (2026-10-13)
+
+### Release
+- URL: https://github.com/bigfguy8/TWRP-Lava-Play-Ultra-lxx521/releases/tag/v3.0-lxx521
+- File: twrp_lxx521_v3.0.img (63,635,456 bytes)
+- SHA256: d6fa8bb9c2fd7ac1895c5ab3a098e0ac92ce9453e52d33c2d7bcccfb1ba5b9a0
+- Status: Community test pending
+
+### v3.0 Features
+- TEE-active (teed + keymint + gatekeeper)
+- SELinux permissive
+- All TEE paths: /mnt/twrp_t6/*
+- init.recovery: 1736 bytes
+- File count: 3464
+- 4 TEE binaries, 13 libraries, 7 .ta files
+
+### Bug #23 Fix
+- Added: androidboot.selinux=permissive to cmdline
+- Reason: TWRP sepolicy lacks explicit teed rules
+- Reference: ref-vb.img used same
+
+### Next Steps
+1. Community test (48h)
+2. If TEE works → success
+3. If TEE fails → v3.1 debug
+4. Kernel building (KERNEL-BUILD-PLAN.md)
