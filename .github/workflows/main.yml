@@ -169,7 +169,7 @@ jobs:
           cp ${{ github.workspace }}/stock-files/vendor_ramdisk00.lz4 /tmp/v00.lz4
           cp ${{ github.workspace }}/stock-files/dtb.img /tmp/dtb.img
           python3 ${{ env.MKBOOT_TOOL }} \
-            --header_version 4 --pagesize 4096 \
+            --header_version 4 --pagesize 4096 --base 0x00000000 \
             --kernel_offset 0x40000000 --ramdisk_offset 0x66f00000 \
             --tags_offset 0x47c80000 --dtb_offset 0x47c80000 \
             --vendor_cmdline "bootopt=64S3,32N2,64N2" --board "" \
