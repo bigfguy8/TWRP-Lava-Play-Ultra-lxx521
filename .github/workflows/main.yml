@@ -11,6 +11,10 @@ on:
         description: 'Inject TEE files'
         type: boolean
         default: false
+      tee_activation:
+        description: 'ACTIVATE TEE services (risky - can bootloop)'
+        type: boolean
+        default: false
       create_release:
         description: 'Create release after verify'
         type: boolean
@@ -143,13 +147,14 @@ jobs:
           chmod 755 $RAMDISK/vendor/bin/hw/*
           echo "TEE files: $(find $RAMDISK/vendor -type f | wc -l)"
           
-          # Swap init.recovery if TEE version available
-          if [ -f "$TEE/etc-init/init.recovery.mt6878.rc.tee" ]; then
+          # Swap init.recovery ONLY if tee_activation=true (DANGEROUS)
+          if [ "${{ inputs.tee_activation }}" = "true" ] && [ -f "$TEE/etc-init/init.recovery.mt6878.rc.tee" ]; then
             cp "$TEE/etc-init/init.recovery.mt6878.rc.tee" "$RAMDISK/init.recovery.mt6878.rc"
-            echo "init.recovery replaced with TEE version"
+            echo "TEE ACTIVATION: init.recovery replaced with TEE version"
             echo "New init.recovery size: $(stat -c '%s' "$RAMDISK/init.recovery.mt6878.rc") bytes"
           else
-            echo "Using standard v1.1 init.recovery"
+            echo "SAFE MODE: Using standard v1.1 init.recovery (no TEE services)"
+            echo "TEE files are present but INACTIVE"
           fi
           
 
