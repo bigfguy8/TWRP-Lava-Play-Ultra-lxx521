@@ -25,3 +25,11 @@ main.yml.backup
 __pycache__/
 *.pyc
 *.pyo
+*.tee.v1.6-backup
+tee-files/etc-init/init.recovery.mt6878.rc.tee.v1.6-backup
+*.v1.6-backup
+
+# v1.6 backup files (must NOT commit)
+tee-files/etc-init/init.recovery.mt6878.rc.tee.v1.6-backup
+*.tee.v1.6-backup
+*.rc.tee.v1.6-backup

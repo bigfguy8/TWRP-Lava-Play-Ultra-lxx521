@@ -134,17 +134,56 @@ jobs:
           mkdir -p $RAMDISK/vendor/bin $RAMDISK/vendor/bin/hw $RAMDISK/vendor/lib64
           mkdir -p $RAMDISK/vendor/etc/init $RAMDISK/vendor/etc/vintf/manifest
           mkdir -p $RAMDISK/vendor/app/t6
+          
+          # Targeted cleanup: only remove STOCK TEE-related .rc files
+          # (keep TWRP's own init files like boot-service, health-service)
+          rm -f $RAMDISK/vendor/etc/init/trustkernel.rc 2>/dev/null || true
+          rm -f $RAMDISK/vendor/etc/init/trustkernel.rc.disabled 2>/dev/null || true
+          rm -f $RAMDISK/vendor/etc/init/android.hardware.security.keymint@*.rc 2>/dev/null || true
+          rm -f $RAMDISK/vendor/etc/init/android.hardware.security.keymint@*.rc.disabled 2>/dev/null || true
+          rm -f $RAMDISK/vendor/etc/init/android.hardware.gatekeeper-service*.rc 2>/dev/null || true
+          rm -f $RAMDISK/vendor/etc/init/android.hardware.gatekeeper-service*.rc.disabled 2>/dev/null || true
+          rm -f $RAMDISK/vendor/etc/init/init.recovery.mt6878.rc.tee 2>/dev/null || true
+          echo "Targeted cleanup done (TWRP files preserved)"
           cp $TEE/bin/teed $RAMDISK/vendor/bin/
           cp $TEE/bin/tee_check_keybox $RAMDISK/vendor/bin/
           cp $TEE/bin-hw/* $RAMDISK/vendor/bin/hw/
           cp $TEE/lib64/*.so $RAMDISK/vendor/lib64/
-          cp $TEE/etc-init/* $RAMDISK/vendor/etc/init/
-          cp $TEE/etc-vintf/* $RAMDISK/vendor/etc/vintf/manifest/
+          # Copy init scripts
+          # TEE mode: SKIP stock .rc (our init.recovery.mt6878.rc defines all services)
+          # Safe mode: rename .rc → .disabled
+          if [ "${{ inputs.tee_activation }}" = "true" ]; then
+            echo "  TEE MODE: Skipping stock .rc copy (our init defines all)"
+          else
+            for rc_file in $TEE/etc-init/*.rc; do
+              [ -f "$rc_file" ] || continue
+              basename_rc=$(basename "$rc_file")
+              cp "$rc_file" "$RAMDISK/vendor/etc/init/${basename_rc}.disabled"
+              echo "  DISABLED: ${basename_rc}.disabled"
+            done
+          fi
+          # VINTF manifests
+          # TEE mode: SKIP stock (our init handles HALs)
+          # Safe mode: rename .xml → .disabled
+          if [ "${{ inputs.tee_activation }}" = "true" ]; then
+            echo "  TEE MODE: Skipping stock VINTF copy"
+          else
+            for xml_file in $TEE/etc-vintf/*.xml; do
+              [ -f "$xml_file" ] || continue
+              basename_xml=$(basename "$xml_file")
+              cp "$xml_file" "$RAMDISK/vendor/etc/vintf/manifest/${basename_xml}.disabled"
+              echo "  DISABLED: ${basename_xml}.disabled"
+            done
+          fi
           cp $TEE/app-t6/*.ta $RAMDISK/vendor/app/t6/
           cp $TEE/app-t6/cfg.ini $RAMDISK/vendor/app/t6/
           cp -r $TEE/app-t6/data $RAMDISK/vendor/app/t6/
           chmod 755 $RAMDISK/vendor/bin/teed $RAMDISK/vendor/bin/tee_check_keybox
           chmod 755 $RAMDISK/vendor/bin/hw/*
+          # Ensure data directory AND contents are readable
+          find $RAMDISK/vendor/app/t6/data -type d -exec chmod 0755 {} \; 2>/dev/null || true
+          find $RAMDISK/vendor/app/t6/data -type f -exec chmod 0644 {} \; 2>/dev/null || true
+          echo "TEE data permissions set"
           echo "TEE files: $(find $RAMDISK/vendor -type f | wc -l)"
           
           # Swap init.recovery ONLY if tee_activation=true (DANGEROUS)
@@ -177,7 +216,7 @@ jobs:
             --header_version 4 --pagesize 4096 --base 0x00000000 \
             --kernel_offset 0x40000000 --ramdisk_offset 0x66f00000 \
             --tags_offset 0x47c80000 --dtb_offset 0x47c80000 \
-            --vendor_cmdline "bootopt=64S3,32N2,64N2" --board "" \
+            --vendor_cmdline "bootopt=64S3,32N2,64N2 androidboot.selinux=permissive" --board "" \
             --dtb /tmp/dtb.img \
             --ramdisk_type 1 --ramdisk_name "" \
             --vendor_ramdisk_fragment /tmp/v00.lz4 \
