@@ -1,0 +1,35 @@
+# Large build artifacts
+*.img
+*.raw
+*.zip
+*.lz4
+
+# Except stock files
+!stock-files/*.img
+!stock-files/*.lz4
+
+# Except TEE files
+!tee-files/**/*.ta
+!tee-files/**/*.so
+!tee-files/**/*.rc
+!tee-files/**/*.xml
+!tee-files/bin/*
+!tee-files/bin-hw/*
+
+# Backup files
+*.backup
+*.bak
+main.yml.backup
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.tee.v1.6-backup
+tee-files/etc-init/init.recovery.mt6878.rc.tee.v1.6-backup
+*.v1.6-backup
+
+# v1.6 backup files (must NOT commit)
+tee-files/etc-init/init.recovery.mt6878.rc.tee.v1.6-backup
+*.tee.v1.6-backup
+*.rc.tee.v1.6-backup
