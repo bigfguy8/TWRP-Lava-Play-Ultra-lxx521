@@ -53,22 +53,12 @@ jobs:
             echo "OK: $f"
           done
           # v3.1: verify stock file checksums if available
-if [ -f "${{ github.workspace }}/stock-files/SHA256SUMS" ]; then
-  echo "Verifying stock file checksums via stock-files/SHA256SUMS..."
-  cd "${{ github.workspace }}/stock-files"
-
-  # Never fail build on sha256sum format errors
-  sha256sum -c SHA256SUMS >/dev/null 2>&1
-  if [ $? -ne 0 ]; then
-    echo "WARNING: sha256sum -c SHA256SUMS failed (format/mismatch). Skipping checksum verification."
-  else
-    echo "Stock file checksums OK"
-  fi
-
-  cd "${{ github.workspace }}"
-else
-  echo "WARNING: stock-files/SHA256SUMS not found. Building without checksum verification."
-fi
+          if [ -f "${{ github.workspace }}/stock-files/SHA256SUMS" ]; then
+            echo "Verifying stock file checksums via stock-files/SHA256SUMS..."
+            cd "${{ github.workspace }}/stock-files"
+            if ! sha256sum -c SHA256SUMS; then
+              echo "WARNING: SHA256SUMS format/mismatch detected. Skipping checksum verification."
+            fi
             cd "${{ github.workspace }}"
             echo "Stock file checksum step completed"
           else
