@@ -1,17 +1,1 @@
-#!/usr/bin/env python3
-import sys, lz4.block
-lz4file = sys.argv[1]
-with open(lz4file, 'rb') as f:
-    data = f.read()
-pos = 4
-output = bytearray()
-while pos < len(data):
-    if pos + 4 > len(data): break
-    bs = int.from_bytes(data[pos:pos+4], 'little')
-    pos += 4
-    if bs == 0: break
-    output += lz4.block.decompress(data[pos:pos+bs], uncompressed_size=16*1024*1024)
-    pos += bs
-with open('/tmp/verify.cpio', 'wb') as f:
-    f.write(output)
-print(f"Decoded: {len(output):,} bytes")
+IyEvdXNyL2Jpbi9lbnYgcHl0aG9uMwoiIiJWZXJpZnkgQ1BJTyBpbnRlZ3JpdHkgaW5zaWRlIExaNCBibG9jayBmaWxlLgoKdjMuMSBmaXg6IHVuY29tcHJlc3NlZF9zaXplIGluY3JlYXNlZCB0byA2NE1CIHRvIG1hdGNoIFRFRSByYW1kaXNrIHNpemUuCiIiIgppbXBvcnQgc3lzLCBsejQuYmxvY2sKCmx6NGZpbGUgPSBzeXMuYXJndlsxXQpNQVhfVU5DT01QUkVTU0VEID0gNjQgKiAxMDI0ICogMTAyNCAgIyA2NCBNQgoKd2l0aCBvcGVuKGx6NGZpbGUsICdyYicpIGFzIGY6CiAgICBkYXRhID0gZi5yZWFkKCkKCnBvcyA9IDQKb3V0cHV0ID0gYnl0ZWFycmF5KCkKd2hpbGUgcG9zIDwgbGVuKGRhdGEpOgogICAgaWYgcG9zICsgNCA+IGxlbihkYXRhKToKICAgICAgICBicmVhawogICAgYnMgPSBpbnQuZnJvbV9ieXRlcyhkYXRhW3Bvczpwb3MrNF0sICdsaXR0bGUnKQogICAgcG9zICs9IDQKICAgIGlmIGJzID09IDA6CiAgICAgICAgYnJlYWsKICAgIG91dHB1dCArPSBsejQuYmxvY2suZGVjb21wcmVzcyhkYXRhW3Bvczpwb3MrYnNdLCB1bmNvbXByZXNzZWRfc2l6ZT1NQVhfVU5DT01QUkVTU0VEKQogICAgcG9zICs9IGJzCgp3aXRoIG9wZW4oJy90bXAvdmVyaWZ5LmNwaW8nLCAnd2InKSBhcyBmOgogICAgZi53cml0ZShvdXRwdXQpCnByaW50KGYiRGVjb2RlZDoge2xlbihvdXRwdXQpOix9IGJ5dGVzIikKCg==
