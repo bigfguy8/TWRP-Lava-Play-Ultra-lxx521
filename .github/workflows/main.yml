@@ -154,7 +154,6 @@ jobs:
           mkdir -p $RAMDISK/vendor/app/t6
           
           # Targeted cleanup: only remove STOCK TEE-related .rc files
-          # (keep TWRP's own init files like boot-service, health-service)
           rm -f $RAMDISK/vendor/etc/init/trustkernel.rc 2>/dev/null || true
           rm -f $RAMDISK/vendor/etc/init/trustkernel.rc.disabled 2>/dev/null || true
           rm -f $RAMDISK/vendor/etc/init/android.hardware.security.keymint@*.rc 2>/dev/null || true
@@ -168,8 +167,6 @@ jobs:
           cp $TEE/bin-hw/* $RAMDISK/vendor/bin/hw/
           cp $TEE/lib64/*.so $RAMDISK/vendor/lib64/
           # Copy init scripts
-          # TEE mode: SKIP stock .rc (our init.recovery.mt6878.rc defines all services)
-          # Safe mode: rename .rc → .disabled
           if [ "${{ inputs.tee_activation }}" = "true" ]; then
             echo "  TEE MODE: Skipping stock .rc copy (our init defines all)"
           else
@@ -181,8 +178,6 @@ jobs:
             done
           fi
           # VINTF manifests
-          # TEE mode: SKIP stock (our init handles HALs)
-          # Safe mode: rename .xml → .disabled
           if [ "${{ inputs.tee_activation }}" = "true" ]; then
             echo "  TEE MODE: Skipping stock VINTF copy"
           else
@@ -214,7 +209,6 @@ jobs:
             echo "TEE files are present but INACTIVE"
           fi
           
-
 
       - name: Repack CPIO
         run: |
