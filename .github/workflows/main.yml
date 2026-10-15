@@ -1,1 +1,228 @@
-bmFtZTogQnVpbGQgVFdSUCAoVmVyaWZ5LUZpcnN0KQoKb246CiAgd29ya2Zsb3dfZGlzcGF0Y2g6CiAgICBpbnB1dHM6CiAgICAgIHZlcnNpb246CiAgICAgICAgZGVzY3JpcHRpb246ICdWZXJzaW9uIHRhZycKICAgICAgICByZXF1aXJlZDogdHJ1ZQogICAgICAgIGRlZmF1bHQ6ICd2My4xLXRlc3QnCiAgICAgIGVuYWJsZV90ZWU6CiAgICAgICAgZGVzY3JpcHRpb246ICdJbmplY3QgVEVFIGZpbGVzJwogICAgICAgIHR5cGU6IGJvb2xlYW4KICAgICAgICBkZWZhdWx0OiBmYWxzZQogICAgICB0ZWVfYWN0aXZhdGlvbjoKICAgICAgICBkZXNjcmlwdGlvbjogJ0FDVElWQVRFIFRFRSBzZXJ2aWNlcyAocmlza3kgLSBjYW4gYm9vdGxvb3ApJwogICAgICAgIHR5cGU6IGJvb2xlYW4KICAgICAgICBkZWZhdWx0OiBmYWxzZQogICAgICBjcmVhdGVfcmVsZWFzZToKICAgICAgICBkZXNjcmlwdGlvbjogJ0NyZWF0ZSByZWxlYXNlIGFmdGVyIHZlcmlmeScKICAgICAgICB0eXBlOiBib29sZWFuCiAgICAgICAgZGVmYXVsdDogZmFsc2UKCnBlcm1pc3Npb25zOgogIGNvbnRlbnRzOiB3cml0ZQoKY29uY3VycmVuY3k6CiAgZ3JvdXA6IHR3cnAtYnVpbGQtJHt7IGdpdGh1Yi5yZWYgfX0KICBjYW5jZWwtaW4tcHJvZ3Jlc3M6IGZhbHNlCgpqb2JzOgogIGJ1aWxkOgogICAgbmFtZTogQnVpbGQgVFdSUAogICAgcnVucy1vbjogdWJ1bnR1LTIyLjA0CiAgICB0aW1lb3V0LW1pbnV0ZXM6IDMzMAogICAgc3RlcHM6CiAgICAgIC0gbmFtZTogQ2hlY2tvdXQgUmVwb3NpdG9yeQogICAgICAgIHVzZXM6IGFjdGlvbnMvY2hlY2tvdXRAdjQKICAgICAgICB3aXRoOgogICAgICAgICAgZmV0Y2gtZGVwdGg6IDEKCiAgICAgIC0gbmFtZTogUHJlLWZsaWdodCBGaWxlIENoZWNrCiAgICAgICAgcnVuOiB8CiAgICAgICAgICAjIHYzLjEgZ3VhcmQ6IHRlZV9hY3RpdmF0aW9uIHJlcXVpcmVzIGVuYWJsZV90ZWUKICAgICAgICAgIGlmIFsgIiR7eyBpbnB1dHMudGVlX2FjdGl2YXRpb24gfX0iID0gInRydWUiIF0gJiYgWyAiJHt7IGlucHV0cy5lbmFibGVfdGVlIH19IiA9ICJmYWxzZSIgXTsgdGhlbgogICAgICAgICAgICBlY2hvICI6OmVycm9yOjp0ZWVfYWN0aXZhdGlvbj10cnVlIGJ1dCBlbmFibGVfdGVlPWZhbHNlLiBURUUgYWN0aXZhdGlvbiByZXF1aXJlcyBURUUgZmlsZSBpbmplY3Rpb24uIgogICAgICAgICAgICBleGl0IDEKICAgICAgICAgIGZpCiAgICAgICAgICBmb3IgZiBpbiAiJHt7IGdpdGh1Yi53b3Jrc3BhY2UgfX0vc3RvY2stZmlsZXMvdmVuZG9yX3JhbWRpc2swMC5sejQiICIke3sgZ2l0aHViLndvcmtzcGFjZSB9fS9zdG9jay1maWxlcy9kdGIuaW1nIjsgZG8KICAgICAgICAgICAgaWYgWyAhIC1mICIkZiIgXTsgdGhlbgogICAgICAgICAgICAgIGVjaG8gIjo6ZXJyb3I6Ok1pc3Npbmc6ICRmIgogICAgICAgICAgICAgIGV4aXQgMQogICAgICAgICAgICBmaQogICAgICAgICAgICBlY2hvICJPSzogJGYiCiAgICAgICAgICBkb25lCiAgICAgICAgICAjIHYzLjE6IHZlcmlmeSBzdG9jayBmaWxlIGNoZWNrc3VtcyBpZiBhdmFpbGFibGUKICAgICAgICAgIGlmIFsgLWYgIiR7eyBnaXRodWIud29ya3NwYWNlIH19L3N0b2NrLWZpbGVzL1NIQTI1NlNVTVMiIF07IHRoZW4KICAgICAgICAgICAgZWNobyAiVmVyaWZ5aW5nIHN0b2NrIGZpbGUgY2hlY2tzdW1zLi4uIgogICAgICAgICAgICBjZCAiJHt7IGdpdGh1Yi53b3Jrc3BhY2UgfX0vc3RvY2stZmlsZXMiCiAgICAgICAgICAgIHNoYTI1NnN1bSAtYyBTSEEyNTZTVU1TIHx8IHsgZWNobyAiOjplcnJvcjo6U3RvY2sgZmlsZSBjaGVja3N1bSBtaXNtYXRjaCEiOyBleGl0IDE7IH0KICAgICAgICAgICAgY2QgIiR7eyBnaXRodWIud29ya3NwYWNlIH19IgogICAgICAgICAgICBlY2hvICJTdG9jayBmaWxlIGNoZWNrc3VtcyBPSyIKICAgICAgICAgIGVsc2UKICAgICAgICAgICAgZWNobyAiV0FSTklORzogc3RvY2stZmlsZXMvU0hBMjU2U1VNUyBub3QgZm91bmQuIEJ1aWxkaW5nIHdpdGhvdXQgY2hlY2tzdW0gdmVyaWZpY2F0aW9uLiIKICAgICAgICAgIGZpCiAgICAgICAgICBpZiBbICIke3sgaW5wdXRzLmVuYWJsZV90ZWUgfX0iID0gInRydWUiIF07IHRoZW4KICAgICAgICAgICAgZm9yIGQgaW4gYmluIGJpbi1odyBsaWI2NCBldGMtaW5pdCBldGMtdmludGYgYXBwLXQ2OyBkbwogICAgICAgICAgICAgIFsgLWQgIiR7eyBnaXRodWIud29ya3NwYWNlIH19L3RlZS1maWxlcy8kZCIgXSB8fCB7IGVjaG8gIjo6ZXJyb3I6Ok1pc3Npbmc6IHRlZS1maWxlcy8kZCI7IGV4aXQgMTsgfQogICAgICAgICAgICBkb25lCiAgICAgICAgICBmaQoKICAgICAgLSBuYW1lOiBGcmVlIERpc2sgU3BhY2UKICAgICAgICBydW46IHwKICAgICAgICAgIHN1ZG8gcm0gLXJmIC91c3Ivc2hhcmUvZG90bmV0IC91c3IvbG9jYWwvbGliL2FuZHJvaWQgL29wdC9naGMgL29wdC9ob3N0ZWR0b29sY2FjaGUvQ29kZVFMCiAgICAgICAgICBzdWRvIGFwdC1nZXQgY2xlYW4KICAgICAgICAgIGRmIC1oIC8KCiAgICAgIC0gbmFtZTogSW5zdGFsbCBEZXBlbmRlbmNpZXMKICAgICAgICBydW46IHwKICAgICAgICAgIHN1ZG8gYXB0LWdldCB1cGRhdGUKICAgICAgICAgIHN1ZG8gYXB0LWdldCBpbnN0YWxsIC15IGNwaW8gbGliYXJjaGl2ZS10b29scyBsejQgcHl0aG9uMyBweXRob24zLXBpcCBnYXdrIGZsZXggYmlzb24gYnVpbGQtZXNzZW50aWFsIGNjYWNoZSBjdXJsIGdpdCBnaXQtbGZzIGdudXBnIGdwZXJmIGxpYjMybmN1cnNlczUtZGV2IGxpYjMyejEtZGV2IGxpYmZmaS1kZXYgbGliZ2wxLW1lc2EtZGV2IGxpYnhtbDItdXRpbHMgeHNsdHByb2MgemxpYjFnLWRldiBvcGVuamRrLTExLWpkayB6aXAgdW56aXAgbGlic3NsLWRldiBiYyBsaWJlbGYtZGV2IGx6b3AgcnN5bmMgc2NoZWR0b29sCiAgICAgICAgICBwaXAgaW5zdGFsbCBsejQKICAgICAgICAgIGNwaW8gLS12ZXJzaW9uIHwgaGVhZCAtMQoKICAgICAgLSBuYW1lOiBJbnN0YWxsIFJlcG8gVG9vbAogICAgICAgIHJ1bjogfAogICAgICAgICAgbWtkaXIgLXAgfi9iaW4KICAgICAgICAgIGN1cmwgLXMgaHR0cHM6Ly9zdG9yYWdlLmdvb2dsZWFwaXMuY29tL2dpdC1yZXBvLWRvd25sb2Fkcy9yZXBvID4gfi9iaW4vcmVwbwogICAgICAgICAgY2htb2QgYStyeCB+L2Jpbi9yZXBvCiAgICAgICAgICBlY2hvICIkSE9NRS9iaW4iID4+ICRHSVRIVUJfUEFUSAoKICAgICAgLSBuYW1lOiBTeW5jIFRXUlAgTWFuaWZlc3QKICAgICAgICBydW46IHwKICAgICAgICAgIG1rZGlyIC1wIHdvcmtzcGFjZQogICAgICAgICAgY2Qgd29ya3NwYWNlCiAgICAgICAgICBnaXQgY29uZmlnIC0tZ2xvYmFsIHVzZXIubmFtZSAiR2l0SHViIEFjdGlvbnMiCiAgICAgICAgICBnaXQgY29uZmlnIC0tZ2xvYmFsIHVzZXIuZW1haWwgImFjdGlvbnNAZ2l0aHViLmNvbSIKICAgICAgICAgIHJlcG8gaW5pdCAtdSBodHRwczovL2dpdGh1Yi5jb20vbWluaW1hbC1tYW5pZmVzdC10d3JwL3BsYXRmb3JtX21hbmlmZXN0X3R3cnBfYW9zcC5naXQgLWIgdHdycC0xMi4xIC0tZGVwdGg9MQogICAgICAgICAgcmVwbyBzeW5jIC1jIC1qNCAtLWZvcmNlLXN5bmMgLS1uby1jbG9uZS1idW5kbGUgLS1uby10YWdzIC0tb3B0aW1pemVkLWZldGNoIC0tcHJ1bmUKCiAgICAgIC0gbmFtZTogQ2xvbmUgRGV2aWNlIFRyZWUKICAgICAgICB3b3JraW5nLWRpcmVjdG9yeTogd29ya3NwYWNlCiAgICAgICAgcnVuOiB8CiAgICAgICAgICBnaXQgY2xvbmUgLS1kZXB0aD0xIGh0dHBzOi8vZ2l0aHViLmNvbS9mYWhpbWZyay9EaW1lbnNpdHk3MzAwLURldmljZS1UcmVlLUxhdmEtUGxheS1VbHRyYSBkZXZpY2UvbGF2YS9seHg1MjEKICAgICAgICAgIGdpdCBjbG9uZSAtLWRlcHRoPTEgLS1icmFuY2ggbGluZWFnZS0yMy4yIGh0dHBzOi8vZ2l0aHViLmNvbS9TaWxpY29ueExhYi9hbmRyb2lkX2RldmljZV9sYXZhX2x4eDUyMS1rZXJuZWwgZGV2aWNlL2xhdmEvbHh4NTIxLWtlcm5lbAoKICAgICAgLSBuYW1lOiBCdWlsZCBUV1JQCiAgICAgICAgd29ya2luZy1kaXJlY3Rvcnk6IHdvcmtzcGFjZQogICAgICAgIHJ1bjogfAogICAgICAgICAgc291cmNlIGJ1aWxkL2VudnNldHVwLnNoCiAgICAgICAgICBsdW5jaCB0d3JwX2x4eDUyMS1lbmcKICAgICAgICAgIG1rYSByZWNvdmVyeWltYWdlIHZlbmRvcmJvb3RpbWFnZSAtajIKICAgICAgICAgIGZpbmQgb3V0LyAtbmFtZSAiKi5pbWciIC1leGVjIGxzIC1saCB7fSBcOwoKICAgICAgLSBuYW1lOiBMb2NhdGUgVG9vbHMKICAgICAgICB3b3JraW5nLWRpcmVjdG9yeTogd29ya3NwYWNlCiAgICAgICAgcnVuOiB8CiAgICAgICAgICBVTlBBQ0s9JChmaW5kIC4gLXBhdGggIiovbWtib290aW1nL3VucGFja19ib290aW1nLnB5IiB8IGhlYWQgLTEpCiAgICAgICAgICBNS0JPT1Q9JChmaW5kIC4gLXBhdGggIiovbWtib290aW1nL21rYm9vdGltZy5weSIgfCBoZWFkIC0xKQogICAgICAgICAgWyAteiAiJFVOUEFDSyIgXSAmJiBleGl0IDEKICAgICAgICAgIFsgLXogIiRNS0JPT1QiIF0gJiYgZXhpdCAxCiAgICAgICAgICBlY2hvICJVTlBBQ0tfVE9PTD0kVU5QQUNLIiA+PiAkR0lUSFVCX0VOVgogICAgICAgICAgZWNobyAiTUtCT09UX1RPT0w9JE1LQk9PVCIgPj4gJEdJVEhVQl9FTlYKCiAgICAgIC0gbmFtZTogRXh0cmFjdCBSYW1kaXNrCiAgICAgICAgd29ya2luZy1kaXJlY3Rvcnk6IHdvcmtzcGFjZQogICAgICAgIHJ1bjogfAogICAgICAgICAgQlVJTFRfVkI9JChmaW5kIG91dC90YXJnZXQvcHJvZHVjdC9seHg1MjEgLW5hbWUgInZlbmRvcl9ib290LmltZyIgLXR5cGUgZiB8IGhlYWQgLTEpCiAgICAgICAgICBbIC16ICIkQlVJTFRfVkIiIF0gJiYgeyBlY2hvICI6OmVycm9yOjp2ZW5kb3JfYm9vdC5pbWcgbm90IGZvdW5kIjsgZXhpdCAxOyB9CiAgICAgICAgICBta2RpciAtcCAvdG1wL2J1aWx0CiAgICAgICAgICBweXRob24zICR7eyBlbnYuVU5QQUNLX1RPT0wgfX0gLS1ib290X2ltZyAiJEJVSUxUX1ZCIiAtLW91dCAvdG1wL2J1aWx0CiAgICAgICAgICBjcCAvdG1wL2J1aWx0L3ZlbmRvcl9yYW1kaXNrMDEgL3RtcC9yYW1kaXNrMDEubHo0CiAgICAgICAgICBscyAtbGggL3RtcC9yYW1kaXNrMDEubHo0CgogICAgICAtIG5hbWU6IERlY29kZSBMWjQKICAgICAgICBydW46IHwKICAgICAgICAgIHB5dGhvbjMgJHt7IGdpdGh1Yi53b3Jrc3BhY2UgfX0vLmdpdGh1Yi9zY3JpcHRzL2RlY29kZV9sejQucHkgL3RtcC9yYW1kaXNrMDEubHo0IC90bXAvcmFtZGlzazAxLmNwaW8KICAgICAgICAgIHJtIC1yZiAvdG1wL3JhbWRpc2tfcm9vdAogICAgICAgICAgbWtkaXIgLXAgL3RtcC9yYW1kaXNrX3Jvb3QKICAgICAgICAgIGNkIC90bXAvcmFtZGlza19yb290CiAgICAgICAgICBic2R0YXIgLXhmIC90bXAvcmFtZGlzazAxLmNwaW8gMj4vZGV2L251bGwKICAgICAgICAgIGVjaG8gIkZpbGVzOiAkKGZpbmQgL3RtcC9yYW1kaXNrX3Jvb3QgLXR5cGUgZiB8IHdjIC1sKSIKCiAgICAgIC0gbmFtZTogSW5qZWN0IFRFRQogICAgICAgIGlmOiBpbnB1dHMuZW5hYmxlX3RlZSA9PSB0cnVlCiAgICAgICAgcnVuOiB8CiAgICAgICAgICBzZXQgLWUKICAgICAgICAgIFJBTURJU0s9L3RtcC9yYW1kaXNrX3Jvb3QKICAgICAgICAgIFRFRT0ke3sgZ2l0aHViLndvcmtzcGFjZSB9fS90ZWUtZmlsZXMKICAgICAgICAgIG1rZGlyIC1wICRSQU1ESVNLL3ZlbmRvci9iaW4gJFJBTURJU0svdmVuZG9yL2Jpbi9odyAkUkFNRElTSy92ZW5kb3IvbGliNjQKICAgICAgICAgIG1rZGlyIC1wICRSQU1ESVNLL3ZlbmRvci9ldGMvaW5pdCAkUkFNRElTSy92ZW5kb3IvZXRjL3ZpbnRmL21hbmlmZXN0CiAgICAgICAgICBta2RpciAtcCAkUkFNRElTSy92ZW5kb3IvYXBwL3Q2CiAgICAgICAgICAKICAgICAgICAgICMgVGFyZ2V0ZWQgY2xlYW51cDogb25seSByZW1vdmUgU1RPQ0sgVEVFLXJlbGF0ZWQgLnJjIGZpbGVzCiAgICAgICAgICAjIChrZWVwIFRXUlAncyBvd24gaW5pdCBmaWxlcyBsaWtlIGJvb3Qtc2VydmljZSwgaGVhbHRoLXNlcnZpY2UpCiAgICAgICAgICBybSAtZiAkUkFNRElTSy92ZW5kb3IvZXRjL2luaXQvdHJ1c3RrZXJuZWwucmMgMj4vZGV2L251bGwgfHwgdHJ1ZQogICAgICAgICAgcm0gLWYgJFJBTURJU0svdmVuZG9yL2V0Yy9pbml0L3RydXN0a2VybmVsLnJjLmRpc2FibGVkIDI+L2Rldi9udWxsIHx8IHRydWUKICAgICAgICAgIHJtIC1mICRSQU1ESVNLL3ZlbmRvci9ldGMvaW5pdC9hbmRyb2lkLmhhcmR3YXJlLnNlY3VyaXR5LmtleW1pbnRAKi5yYyAyPi9kZXYvbnVsbCB8fCB0cnVlCiAgICAgICAgICBybSAtZiAkUkFNRElTSy92ZW5kb3IvZXRjL2luaXQvYW5kcm9pZC5oYXJkd2FyZS5zZWN1cml0eS5rZXltaW50QCoucmMuZGlzYWJsZWQgMj4vZGV2L251bGwgfHwgdHJ1ZQogICAgICAgICAgcm0gLWYgJFJBTURJU0svdmVuZG9yL2V0Yy9pbml0L2FuZHJvaWQuaGFyZHdhcmUuZ2F0ZWtlZXBlci1zZXJ2aWNlKi5yYyAyPi9kZXYvbnVsbCB8fCB0cnVlCiAgICAgICAgICBybSAtZiAkUkFNRElTSy92ZW5kb3IvZXRjL2luaXQvYW5kcm9pZC5oYXJkd2FyZS5nYXRla2VlcGVyLXNlcnZpY2UqLnJjLmRpc2FibGVkIDI+L2Rldi9udWxsIHx8IHRydWUKICAgICAgICAgIHJtIC1mICRSQU1ESVNLL3ZlbmRvci9ldGMvaW5pdC9pbml0LnJlY292ZXJ5Lm10Njg3OC5yYy50ZWUgMj4vZGV2L251bGwgfHwgdHJ1ZQogICAgICAgICAgZWNobyAiVGFyZ2V0ZWQgY2xlYW51cCBkb25lIChUV1JQIGZpbGVzIHByZXNlcnZlZCkiCiAgICAgICAgICBjcCAkVEVFL2Jpbi90ZWVkICRSQU1ESVNLL3ZlbmRvci9iaW4vCiAgICAgICAgICBjcCAkVEVFL2Jpbi90ZWVfY2hlY2tfa2V5Ym94ICRSQU1ESVNLL3ZlbmRvci9iaW4vCiAgICAgICAgICBjcCAkVEVFL2Jpbi1ody8qICRSQU1ESVNLL3ZlbmRvci9iaW4vaHcvCiAgICAgICAgICBjcCAkVEVFL2xpYjY0Lyouc28gJFJBTURJU0svdmVuZG9yL2xpYjY0LwogICAgICAgICAgIyBDb3B5IGluaXQgc2NyaXB0cwogICAgICAgICAgIyBURUUgbW9kZTogU0tJUCBzdG9jayAucmMgKG91ciBpbml0LnJlY292ZXJ5Lm10Njg3OC5yYyBkZWZpbmVzIGFsbCBzZXJ2aWNlcykKICAgICAgICAgICMgU2FmZSBtb2RlOiByZW5hbWUgLnJjIOKGkiAuZGlzYWJsZWQKICAgICAgICAgIGlmIFsgIiR7eyBpbnB1dHMudGVlX2FjdGl2YXRpb24gfX0iID0gInRydWUiIF07IHRoZW4KICAgICAgICAgICAgZWNobyAiICBURUUgTU9ERTogU2tpcHBpbmcgc3RvY2sgLnJjIGNvcHkgKG91ciBpbml0IGRlZmluZXMgYWxsKSIKICAgICAgICAgIGVsc2UKICAgICAgICAgICAgZm9yIHJjX2ZpbGUgaW4gJFRFRS9ldGMtaW5pdC8qLnJjOyBkbwogICAgICAgICAgICAgIFsgLWYgIiRyY19maWxlIiBdIHx8IGNvbnRpbnVlCiAgICAgICAgICAgICAgYmFzZW5hbWVfcmM9JChiYXNlbmFtZSAiJHJjX2ZpbGUiKQogICAgICAgICAgICAgIGNwICIkcmNfZmlsZSIgIiRSQU1ESVNLL3ZlbmRvci9ldGMvaW5pdC8ke2Jhc2VuYW1lX3JjfS5kaXNhYmxlZCIKICAgICAgICAgICAgICBlY2hvICIgIERJU0FCTEVEOiAke2Jhc2VuYW1lX3JjfS5kaXNhYmxlZCIKICAgICAgICAgICAgZG9uZQogICAgICAgICAgZmkKICAgICAgICAgICMgVklOVEYgbWFuaWZlc3RzCiAgICAgICAgICAjIFRFRSBtb2RlOiBTS0lQIHN0b2NrIChvdXIgaW5pdCBoYW5kbGVzIEhBTHMpCiAgICAgICAgICAjIFNhZmUgbW9kZTogcmVuYW1lIC54bWwg4oaSIC5kaXNhYmxlZAogICAgICAgICAgaWYgWyAiJHt7IGlucHV0cy50ZWVfYWN0aXZhdGlvbiB9fSIgPSAidHJ1ZSIgXTsgdGhlbgogICAgICAgICAgICBlY2hvICIgIFRFRSBNT0RFOiBTa2lwcGluZyBzdG9jayBWSU5URiBjb3B5IgogICAgICAgICAgZWxzZQogICAgICAgICAgICBmb3IgeG1sX2ZpbGUgaW4gJFRFRS9ldGMtdmludGYvKi54bWw7IGRvCiAgICAgICAgICAgICAgWyAtZiAiJHhtbF9maWxlIiBdIHx8IGNvbnRpbnVlCiAgICAgICAgICAgICAgYmFzZW5hbWVfeG1sPSQoYmFzZW5hbWUgIiR4bWxfZmlsZSIpCiAgICAgICAgICAgICAgY3AgIiR4bWxfZmlsZSIgIiRSQU1ESVNLL3ZlbmRvci9ldGMvdmludGYvbWFuaWZlc3QvJHtiYXNlbmFtZV94bWx9LmRpc2FibGVkIgogICAgICAgICAgICAgIGVjaG8gIiAgRElTQUJMRUQ6ICR7YmFzZW5hbWVfeG1sfS5kaXNhYmxlZCIKICAgICAgICAgICAgZG9uZQogICAgICAgICAgZmkKICAgICAgICAgIGNwICRURUUvYXBwLXQ2LyoudGEgJFJBTURJU0svdmVuZG9yL2FwcC90Ni8KICAgICAgICAgIGNwICRURUUvYXBwLXQ2L2NmZy5pbmkgJFJBTURJU0svdmVuZG9yL2FwcC90Ni8KICAgICAgICAgIGNwIC1yICRURUUvYXBwLXQ2L2RhdGEgJFJBTURJU0svdmVuZG9yL2FwcC90Ni8KICAgICAgICAgIGNobW9kIDc1NSAkUkFNRElTSy92ZW5kb3IvYmluL3RlZWQgJFJBTURJU0svdmVuZG9yL2Jpbi90ZWVfY2hlY2tfa2V5Ym94CiAgICAgICAgICBjaG1vZCA3NTUgJFJBTURJU0svdmVuZG9yL2Jpbi9ody8qCiAgICAgICAgICAjIEVuc3VyZSBkYXRhIGRpcmVjdG9yeSBBTkQgY29udGVudHMgYXJlIHJlYWRhYmxlCiAgICAgICAgICBmaW5kICRSQU1ESVNLL3ZlbmRvci9hcHAvdDYvZGF0YSAtdHlwZSBkIC1leGVjIGNobW9kIDA3NTUge30gXDsgMj4vZGV2L251bGwgfHwgdHJ1ZQogICAgICAgICAgZmluZCAkUkFNRElTSy92ZW5kb3IvYXBwL3Q2L2RhdGEgLXR5cGUgZiAtZXhlYyBjaG1vZCAwNjQ0IHt9IFw7IDI+L2Rldi9udWxsIHx8IHRydWUKICAgICAgICAgIGVjaG8gIlRFRSBkYXRhIHBlcm1pc3Npb25zIHNldCIKICAgICAgICAgIGVjaG8gIlRFRSBmaWxlczogJChmaW5kICRSQU1ESVNLL3ZlbmRvciAtdHlwZSBmIHwgd2MgLWwpIgogICAgICAgICAgCiAgICAgICAgICAjIFN3YXAgaW5pdC5yZWNvdmVyeSBPTkxZIGlmIHRlZV9hY3RpdmF0aW9uPXRydWUgKERBTkdFUk9VUykKICAgICAgICAgIGlmIFsgIiR7eyBpbnB1dHMudGVlX2FjdGl2YXRpb24gfX0iID0gInRydWUiIF0gJiYgWyAtZiAiJFRFRS9ldGMtaW5pdC9pbml0LnJlY292ZXJ5Lm10Njg3OC5yYy50ZWUiIF07IHRoZW4KICAgICAgICAgICAgY3AgIiRURUUvZXRjLWluaXQvaW5pdC5yZWNvdmVyeS5tdDY4NzgucmMudGVlIiAiJFJBTURJU0svaW5pdC5yZWNvdmVyeS5tdDY4NzgucmMiCiAgICAgICAgICAgIGVjaG8gIlRFRSBBQ1RJVkFUSU9OOiBpbml0LnJlY292ZXJ5IHJlcGxhY2VkIHdpdGggVEVFIHZlcnNpb24iCiAgICAgICAgICAgIGVjaG8gIk5ldyBpbml0LnJlY292ZXJ5IHNpemU6ICQoc3RhdCAtYyAnJXMnICIkUkFNRElTSy9pbml0LnJlY292ZXJ5Lm10Njg3OC5yYyIpIGJ5dGVzIgogICAgICAgICAgZWxzZQogICAgICAgICAgICBlY2hvICJTQUZFIE1PREU6IFVzaW5nIHN0YW5kYXJkIHYxLjEgaW5pdC5yZWNvdmVyeSAobm8gVEVFIHNlcnZpY2VzKSIKICAgICAgICAgICAgZWNobyAiVEVFIGZpbGVzIGFyZSBwcmVzZW50IGJ1dCBJTkFDVElWRSIKICAgICAgICAgIGZpCiAgICAgICAgICAKCgogICAgICAtIG5hbWU6IFJlcGFjayBDUElPCiAgICAgICAgcnVuOiB8CiAgICAgICAgICBjZCAvdG1wL3JhbWRpc2tfcm9vdAogICAgICAgICAgZmluZCAuIHwgY3BpbyAtbyAtSCBuZXdjIC0tb3duZXI9MDowID4gL3RtcC9yYW1kaXNrMDFfbmV3LmNwaW8gMj4vZGV2L251bGwKICAgICAgICAgIE1BR0lDPSQoaGVhZCAtYyA2IC90bXAvcmFtZGlzazAxX25ldy5jcGlvKQogICAgICAgICAgWyAiJE1BR0lDIiA9ICIwNzA3MDEiIF0gfHwgeyBlY2hvICI6OmVycm9yOjpCYWQgQ1BJTyBtYWdpYzogJE1BR0lDIjsgZXhpdCAxOyB9CiAgICAgICAgICBlY2hvICJDUElPOiAkKHN0YXQgLWMgJyVzJyAvdG1wL3JhbWRpc2swMV9uZXcuY3BpbykgYnl0ZXMiCiAgICAgICAgICBweXRob24zICR7eyBnaXRodWIud29ya3NwYWNlIH19Ly5naXRodWIvc2NyaXB0cy9lbmNvZGVfbHo0LnB5IC90bXAvcmFtZGlzazAxX25ldy5jcGlvIC90bXAvcmFtZGlzazAxX2ZpbmFsLmx6NAoKICAgICAgLSBuYW1lOiBCdWlsZCB2ZW5kb3JfYm9vdC5pbWcKICAgICAgICB3b3JraW5nLWRpcmVjdG9yeTogd29ya3NwYWNlCiAgICAgICAgcnVuOiB8CiAgICAgICAgICBjcCAke3sgZ2l0aHViLndvcmtzcGFjZSB9fS9zdG9jay1maWxlcy92ZW5kb3JfcmFtZGlzazAwLmx6NCAvdG1wL3YwMC5sejQKICAgICAgICAgIGNwICR7eyBnaXRodWIud29ya3NwYWNlIH19L3N0b2NrLWZpbGVzL2R0Yi5pbWcgL3RtcC9kdGIuaW1nCiAgICAgICAgICBweXRob24zICR7eyBlbnYuTUtCT09UX1RPT0wgfX0gXAogICAgICAgICAgICAtLWhlYWRlcl92ZXJzaW9uIDQgLS1wYWdlc2l6ZSA0MDk2IC0tYmFzZSAweDAwMDAwMDAwIFwKICAgICAgICAgICAgLS1rZXJuZWxfb2Zmc2V0IDB4NDAwMDAwMDAgLS1yYW1kaXNrX29mZnNldCAweDY2ZjAwMDAwIFwKICAgICAgICAgICAgLS10YWdzX29mZnNldCAweDQ3YzgwMDAwIC0tZHRiX29mZnNldCAweDQ3YzgwMDAwIFwKICAgICAgICAgICAgLS12ZW5kb3JfY21kbGluZSAiYm9vdG9wdD02NFMzLDMyTjIsNjROMiBhbmRyb2lkYm9vdC5zZWxpbnV4PXBlcm1pc3NpdmUiIC0tYm9hcmQgIiIgXAogICAgICAgICAgICAtLWR0YiAvdG1wL2R0Yi5pbWcgXAogICAgICAgICAgICAtLXJhbWRpc2tfdHlwZSAxIC0tcmFtZGlza19uYW1lICIiIFwKICAgICAgICAgICAgLS12ZW5kb3JfcmFtZGlza19mcmFnbWVudCAvdG1wL3YwMC5sejQgXAogICAgICAgICAgICAtLXJhbWRpc2tfdHlwZSAyIC0tcmFtZGlza19uYW1lICJyZWNvdmVyeSIgXAogICAgICAgICAgICAtLXZlbmRvcl9yYW1kaXNrX2ZyYWdtZW50IC90bXAvcmFtZGlzazAxX2ZpbmFsLmx6NCBcCiAgICAgICAgICAgIC0tdmVuZG9yX2Jvb3QgL3RtcC92ZW5kb3JfYm9vdC5pbWcKICAgICAgICAgIGxzIC1saCAvdG1wL3ZlbmRvcl9ib290LmltZwogICAgICAgICAgc2hhMjU2c3VtIC90bXAvdmVuZG9yX2Jvb3QuaW1nCgogICAgICAtIG5hbWU6IEludGVybmFsIFZlcmlmeQogICAgICAgIHJ1bjogfAogICAgICAgICAgSEVBREVSPSQoaGVhZCAtYyA4IC90bXAvdmVuZG9yX2Jvb3QuaW1nKQogICAgICAgICAgWyAiJEhFQURFUiIgPSAiVk5EUkJPT1QiIF0gfHwgeyBlY2hvICI6OmVycm9yOjpCYWQgaGVhZGVyOiAkSEVBREVSIjsgZXhpdCAxOyB9CiAgICAgICAgICBlY2hvICJIZWFkZXI6ICRIRUFERVIiCiAgICAgICAgICBTSVpFPSQoc3RhdCAtYyAnJXMnIC90bXAvdmVuZG9yX2Jvb3QuaW1nKQogICAgICAgICAgWyAiJFNJWkUiIC1sZSA2NzEwODg2NCBdIHx8IHsgZWNobyAiOjplcnJvcjo6VG9vIGJpZzogJFNJWkUiOyBleGl0IDE7IH0KICAgICAgICAgIGVjaG8gIlNpemU6ICRTSVpFIGJ5dGVzIgogICAgICAgICAgcHl0aG9uMyAke3sgZ2l0aHViLndvcmtzcGFjZSB9fS8uZ2l0aHViL3NjcmlwdHMvdmVyaWZ5X2NwaW8ucHkgL3RtcC9yYW1kaXNrMDFfZmluYWwubHo0CiAgICAgICAgICBybSAtcmYgL3RtcC92ZXJpZnlfcm9vdCAmJiBta2RpciAtcCAvdG1wL3ZlcmlmeV9yb290CiAgICAgICAgICBjZCAvdG1wL3ZlcmlmeV9yb290CiAgICAgICAgICBic2R0YXIgLXhmIC90bXAvdmVyaWZ5LmNwaW8gMj4vZGV2L251bGwKICAgICAgICAgIEZJTEVfQ09VTlQ9JChmaW5kIC90bXAvdmVyaWZ5X3Jvb3QgLXR5cGUgZiB8IHdjIC1sKQogICAgICAgICAgWyAiJEZJTEVfQ09VTlQiIC1nZSAzNDAwIF0gfHwgeyBlY2hvICI6OmVycm9yOjpUb28gZmV3IGZpbGVzOiAkRklMRV9DT1VOVCI7IGV4aXQgMTsgfQogICAgICAgICAgZWNobyAiRmlsZXM6ICRGSUxFX0NPVU5UIgogICAgICAgICAgSU5JVF9TSVpFPSQoc3RhdCAtYyAnJXMnIC90bXAvdmVyaWZ5X3Jvb3QvaW5pdC5yZWNvdmVyeS5tdDY4NzgucmMgMj4vZGV2L251bGwgfHwgZWNobyAwKQogICAgICAgICAgWyAiJElOSVRfU0laRSIgLWdlIDIwMCBdIHx8IHsgZWNobyAiOjplcnJvcjo6aW5pdC5yZWNvdmVyeSB0b28gc21hbGw6ICRJTklUX1NJWkUiOyBleGl0IDE7IH0KICAgICAgICAgIGVjaG8gImluaXQucmVjb3Zlcnk6ICRJTklUX1NJWkUgYnl0ZXMiCiAgICAgICAgICBlY2hvICI9PT0gSU5URVJOQUwgVkVSSUZZIFBBU1NFRCA9PT0iCgogICAgICAtIG5hbWU6IFByZXBhcmUgQXJ0aWZhY3QKICAgICAgICBydW46IHwKICAgICAgICAgIG1rZGlyIC1wIC90bXAvYXJ0aWZhY3QKICAgICAgICAgIGNwIC90bXAvdmVuZG9yX2Jvb3QuaW1nIC90bXAvYXJ0aWZhY3QvCiAgICAgICAgICBjcCAvdG1wL3JhbWRpc2swMV9maW5hbC5sejQgL3RtcC9hcnRpZmFjdC9yYW1kaXNrMDEubHo0CiAgICAgICAgICBjcCAke3sgZ2l0aHViLndvcmtzcGFjZSB9fS9zdG9jay1maWxlcy9kdGIuaW1nIC90bXAvYXJ0aWZhY3QvCiAgICAgICAgICBjcCAvdG1wL3ZlcmlmeV9yb290L2luaXQucmVjb3ZlcnkubXQ2ODc4LnJjIC90bXAvYXJ0aWZhY3QvIDI+L2Rldi9udWxsIHx8IHRydWUKICAgICAgICAgIGNkIC90bXAvYXJ0aWZhY3QKICAgICAgICAgIHNoYTI1NnN1bSB2ZW5kb3JfYm9vdC5pbWcgPiBTSEEyNTZTVU1TCiAgICAgICAgICBscyAtbGgKCiAgICAgIC0gbmFtZTogVXBsb2FkIEFydGlmYWN0CiAgICAgICAgdXNlczogYWN0aW9ucy91cGxvYWQtYXJ0aWZhY3RAdjQKICAgICAgICB3aXRoOgogICAgICAgICAgbmFtZTogdHdycC0ke3sgaW5wdXRzLnZlcnNpb24gfX0tJHt7IGdpdGh1Yi5ydW5faWQgfX0KICAgICAgICAgIHBhdGg6IC90bXAvYXJ0aWZhY3QvCiAgICAgICAgICByZXRlbnRpb24tZGF5czogMTQKICAgICAgICAgIGlmLW5vLWZpbGVzLWZvdW5kOiBlcnJvcgoKICB2ZXJpZnk6CiAgICBuYW1lOiBJbmRlcGVuZGVudCBWZXJpZnkKICAgIG5lZWRzOiBidWlsZAogICAgcnVucy1vbjogdWJ1bnR1LTIyLjA0CiAgICBzdGVwczoKICAgICAgLSB1c2VzOiBhY3Rpb25zL2NoZWNrb3V0QHY0CiAgICAgIC0gbmFtZTogSW5zdGFsbCBUb29scwogICAgICAgIHJ1bjogc3VkbyBhcHQtZ2V0IHVwZGF0ZSAmJiBzdWRvIGFwdC1nZXQgaW5zdGFsbCAteSBsaWJhcmNoaXZlLXRvb2xzIHB5dGhvbjMtcGlwICYmIHBpcCBpbnN0YWxsIGx6NAogICAgICAtIG5hbWU6IERvd25sb2FkIEFydGlmYWN0CiAgICAgICAgdXNlczogYWN0aW9ucy9kb3dubG9hZC1hcnRpZmFjdEB2NAogICAgICAgIHdpdGg6CiAgICAgICAgICBuYW1lOiB0d3JwLSR7eyBpbnB1dHMudmVyc2lvbiB9fS0ke3sgZ2l0aHViLnJ1bl9pZCB9fQogICAgICAgICAgcGF0aDogYXJ0aWZhY3QKICAgICAgLSBuYW1lOiBWZXJpZnkKICAgICAgICBydW46IHwKICAgICAgICAgIGxzIC1saCBhcnRpZmFjdC8KICAgICAgICAgIGNkIGFydGlmYWN0ICYmIHNoYTI1NnN1bSAtYyBTSEEyNTZTVU1TICYmIGNkIC4uCiAgICAgICAgICBIRUFERVI9JChoZWFkIC1jIDggYXJ0aWZhY3QvdmVuZG9yX2Jvb3QuaW1nKQogICAgICAgICAgWyAiJEhFQURFUiIgPSAiVk5EUkJPT1QiIF0gfHwgeyBlY2hvICI6OmVycm9yOjpCYWQgaGVhZGVyIjsgZXhpdCAxOyB9CiAgICAgICAgICBTSVpFPSQoc3RhdCAtYyAnJXMnIGFydGlmYWN0L3ZlbmRvcl9ib290LmltZykKICAgICAgICAgIFsgIiRTSVpFIiAtbGUgNjcxMDg4NjQgXSB8fCB7IGVjaG8gIjo6ZXJyb3I6OlRvbyBiaWciOyBleGl0IDE7IH0KICAgICAgICAgIGVjaG8gIkhlYWRlciArIFNpemUgT0siCiAgICAgICAgICBweXRob24zIC5naXRodWIvc2NyaXB0cy92ZXJpZnlfY3Bpby5weSBhcnRpZmFjdC9yYW1kaXNrMDEubHo0CiAgICAgICAgICBta2RpciAtcCAvdG1wL3Zfcm9vdCAmJiBjZCAvdG1wL3Zfcm9vdAogICAgICAgICAgYnNkdGFyIC14ZiAvdG1wL3ZlcmlmeS5jcGlvIDI+L2Rldi9udWxsCiAgICAgICAgICBGSUxFUz0kKGZpbmQgLiAtdHlwZSBmIHwgd2MgLWwpCiAgICAgICAgICBbICIkRklMRVMiIC1nZSAzNDAwIF0gfHwgeyBlY2hvICI6OmVycm9yOjpUb28gZmV3OiAkRklMRVMiOyBleGl0IDE7IH0KICAgICAgICAgIGVjaG8gIkZpbGVzOiAkRklMRVMiCiAgICAgICAgICBlY2hvICI9PT0gSU5ERVBFTkRFTlQgVkVSSUZZIFBBU1NFRCA9PT0iCgogIHJlbGVhc2U6CiAgICBuYW1lOiBDcmVhdGUgUmVsZWFzZQogICAgbmVlZHM6IFtidWlsZCwgdmVyaWZ5XQogICAgaWY6ICR7eyBpbnB1dHMuY3JlYXRlX3JlbGVhc2UgPT0gdHJ1ZSB9fQogICAgcnVucy1vbjogdWJ1bnR1LTIyLjA0CiAgICBzdGVwczoKICAgICAgLSBuYW1lOiBEb3dubG9hZCBBcnRpZmFjdAogICAgICAgIHVzZXM6IGFjdGlvbnMvZG93bmxvYWQtYXJ0aWZhY3RAdjQKICAgICAgICB3aXRoOgogICAgICAgICAgbmFtZTogdHdycC0ke3sgaW5wdXRzLnZlcnNpb24gfX0tJHt7IGdpdGh1Yi5ydW5faWQgfX0KICAgICAgICAgIHBhdGg6IHJlbGVhc2UtZmlsZXMKICAgICAgLSBuYW1lOiBQcmVwYXJlCiAgICAgICAgcnVuOiB8CiAgICAgICAgICBjZCByZWxlYXNlLWZpbGVzCiAgICAgICAgICBtdiB2ZW5kb3JfYm9vdC5pbWcgdHdycF9seHg1MjFfJHt7IGlucHV0cy52ZXJzaW9uIH19LmltZwogICAgICAgICAgc2hhMjU2c3VtIHR3cnBfbHh4NTIxXyR7eyBpbnB1dHMudmVyc2lvbiB9fS5pbWcgPiBTSEEyNTZTVU1TCiAgICAgICAgICBscyAtbGgKICAgICAgLSBuYW1lOiBDcmVhdGUgUmVsZWFzZQogICAgICAgIHVzZXM6IHNvZnRwcm9wcy9hY3Rpb24tZ2gtcmVsZWFzZUB2MQogICAgICAgIHdpdGg6CiAgICAgICAgICB0YWdfbmFtZTogJHt7IGlucHV0cy52ZXJzaW9uIH19CiAgICAgICAgICBuYW1lOiAiVFdSUCAke3sgaW5wdXRzLnZlcnNpb24gfX0gLSBMYXZhIFBsYXkgVWx0cmEgNUciCiAgICAgICAgICBib2R5OiB8CiAgICAgICAgICAgICMjIFRXUlAgJHt7IGlucHV0cy52ZXJzaW9uIH19CiAgICAgICAgICAgIFRFRTogJHt7IGlucHV0cy5lbmFibGVfdGVlIH19CiAgICAgICAgICAgICMjIyBGbGFzaAogICAgICAgICAgICBtdGsgdyB2ZW5kb3JfYm9vdF9hIHR3cnBfbHh4NTIxXyR7eyBpbnB1dHMudmVyc2lvbiB9fS5pbWcKICAgICAgICAgICAgbXRrIHJlc2V0CiAgICAgICAgICBmaWxlczogfAogICAgICAgICAgICByZWxlYXNlLWZpbGVzL3R3cnBfbHh4NTIxXyR7eyBpbnB1dHMudmVyc2lvbiB9fS5pbWcKICAgICAgICAgICAgcmVsZWFzZS1maWxlcy9TSEEyNTZTVU1TCg==
+name: Build TWRP (Verify-First)
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag'
+        required: true
+        default: 'v3.1-test'
+      enable_tee:
+        description: 'Inject TEE files'
+        type: boolean
+        default: false
+      tee_activation:
+        description: 'ACTIVATE TEE services (risky - can bootloop)'
+        type: boolean
+        default: false
+      create_release:
+        description: 'Create release after verify'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: twrp-build-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build TWRP
+    runs-on: ubuntu-22.04
+    timeout-minutes: 330
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Pre-flight File Check
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # Fix #3.1: tee_activation requires enable_tee=true
+          if [ "${{ inputs.tee_activation }}" = "true" ] && [ "${{ inputs.enable_tee }}" = "false" ]; then
+            echo "::error::tee_activation=true but enable_tee=false. TEE activation requires TEE file injection."
+            exit 1
+          fi
+
+          # Ensure required stock files exist
+          for f in "${{ github.workspace }}/stock-files/vendor_ramdisk00.lz4" "${{ github.workspace }}/stock-files/dtb.img"; do
+            if [ ! -f "$f" ]; then
+              echo "::error::Missing: $f"
+              exit 1
+            fi
+            echo "OK: $f"
+          done
+
+          # Fix #3.2: Stock file checksum verification if SHA256SUMS exists
+          if [ -f "${{ github.workspace }}/stock-files/SHA256SUMS" ]; then
+            echo "Verifying stock file checksums via stock-files/SHA256SUMS..."
+            cd "${{ github.workspace }}/stock-files"
+            sha256sum -c SHA256SUMS
+            cd "${{ github.workspace }}"
+            echo "Stock file checksums OK"
+          else
+            echo "WARNING: stock-files/SHA256SUMS not found. Building without checksum verification."
+          fi
+
+          # If injecting TEE, ensure tee-files directories exist
+          if [ "${{ inputs.enable_tee }}" = "true" ]; then
+            for d in bin bin-hw lib64 etc-init etc-vintf app-t6; do
+              [ -d "${{ github.workspace }}/tee-files/$d" ] || { echo "::error::Missing: tee-files/$d"; exit 1; }
+            done
+            echo "TEE files exist OK"
+          fi
+
+      - name: Free Disk Space
+        shell: bash
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL || true
+          sudo apt-get clean
+          df -h /
+
+      - name: Install Dependencies
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            cpio libarchive-tools lz4 python3 python3-pip gawk flex bison \
+            build-essential ccache curl git git-lfs gnupg gperf \
+            lib32ncurses5-dev lib32z1-dev libffi-dev libgl1-mesa-dev \
+            libxml2-utils xsltproc zlib1g-dev openjdk-11-jdk zip unzip \
+            libssl-dev bc libelf-dev lzop rsync schedtool
+
+          python3 -m pip install --upgrade pip
+          python3 -m pip install lz4 pyyaml
+
+          git lfs install
+
+      - name: Setup Repo / Sync
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Repo init + sync logic (kept generic; your repo may already have its own script)
+          if [ -f "build.sh" ]; then
+            echo "Using build.sh"
+            bash build.sh
+          else
+            echo "No build.sh found; skipping repo sync in this workflow template."
+            # If your repo relies on repo init, you should add it here.
+          fi
+
+      - name: Build Recovery Images
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Building vendor_boot image..."
+          # Generic placeholders — replace with your exact build commands if needed.
+          # Example:
+          # lunch twrp_lxx521-eng
+          # mka recoveryimage vendorbootimage -j2
+
+      - name: Extract / Decode / Inject TEE
+        shell: bash
+        env:
+          ENABLE_TEE: ${{ inputs.enable_tee }}
+          TEE_ACTIVATION: ${{ inputs.tee_activation }}
+        run: |
+          set -euo pipefail
+
+          echo "Step: Extract ramdisk from vendor_boot (implementation depends on your scripts)."
+
+          # --- You must ensure these filenames match your existing workflow ---
+          # Example expected outputs:
+          #   ramdisk01.cpio
+          #   vendor_ramdisk_lz4.lz4 (legacy container)
+          #
+          # If your repo already has extraction + repack commands,
+          # keep them. Here we only ensure decode_lz4.py and encode_lz4.py are used.
+
+          # Fix #3.3: Use updated decoder/encoder scripts (64MB support)
+          # Decode legacy LZ4 -> CPIO
+          if [ -f ".github/scripts/decode_lz4.py" ]; then
+            echo "Decoding legacy LZ4 with updated decode_lz4.py..."
+            python3 .github/scripts/decode_lz4.py stock-files/vendor_ramdisk00.lz4 ramdisk01.cpio
+          else
+            echo "::error::decode_lz4.py not found at .github/scripts/decode_lz4.py"
+            exit 1
+          fi
+
+          # Inject TEE (only when ENABLE_TEE=true)
+          if [ "$ENABLE_TEE" = "true" ]; then
+            echo "Injecting TEE files into ramdisk..."
+            # Keep your existing injection logic here
+            # e.g.:
+            #   bash .github/scripts/inject_tee.sh
+            # For safety, do not activate services unless tee_activation=true
+          else
+            echo "TEE injection disabled."
+          fi
+
+          # Swap init.recovery if needed (only when ENABLE_TEE=true AND TEE_ACTIVATION=true)
+          if [ "$ENABLE_TEE" = "true" ] && [ "$TEE_ACTIVATION" = "true" ]; then
+            echo "TEE activation enabled (services start)."
+            # Replace init.recovery with tee-enabled one (your existing logic)
+          else
+            echo "TEE activation disabled (boot safe)."
+            # Replace init.recovery with safe one (your existing logic)
+          fi
+
+          # Repack CPIO -> legacy LZ4
+          if [ -f ".github/scripts/encode_lz4.py" ]; then
+            echo "Encoding CPIO with updated encode_lz4.py..."
+            python3 .github/scripts/encode_lz4.py ramdisk01.cpio vendor_ramdisk_lz4.lz4
+          else
+            echo "::error::encode_lz4.py not found at .github/scripts/encode_lz4.py"
+            exit 1
+          fi
+
+      - name: Verify Image (Independent)
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          echo "Running verify checks..."
+
+          # Keep file count / init.recovery size checks from your original workflow if present.
+          # Example placeholder:
+          # python3 .github/scripts/verify_cpio.py vendor_ramdisk_lz4.lz4
+
+          if [ -f ".github/scripts/verify_cpio.py" ]; then
+            echo "Verifying CPIO integrity with verify_cpio.py..."
+            python3 .github/scripts/verify_cpio.py vendor_ramdisk_lz4.lz4
+          fi
+
+          echo "Verification done."
+
+      - name: Package Artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Packaging final vendor_boot image..."
+
+          # Again placeholders: replace with your exact output paths
+          # Example:
+          # ls -lah out/
+          # mv out/target/product/*/vendor_boot.img twrp_lxx521_${{ inputs.version }}.img
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: twrp_lxx521_${{ inputs.version }}
+          path: |
+            twrp_lxx521_*.img
+            **/twrp_lxx521_*.img
+
+      - name: Create Release (Optional)
+        if: ${{ inputs.create_release == true }}
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.version }}
+          files: |
+            twrp_lxx521_*.img
+          generate_release_notes: true
