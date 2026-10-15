@@ -1,1 +1,70 @@
-IyBUV1JQIGZvciBMYXZhIFBsYXkgVWx0cmEgNUcgKGx4eDUyMSkKCkN1c3RvbSBUV1JQIHJlY292ZXJ5IGZvciAqKkxhdmEgUGxheSBVbHRyYSA1RyoqIChseHg1MjEgLyBNZWRpYVRlayBEaW1lbnNpdHkgNzMwMCkuCgojIyBEb3dubG9hZHMKCnwgVmVyc2lvbiB8IFN0YXR1cyB8IExpbmsgfAp8LS0tfC0tLXwtLS18CnwgKip2My4wKiogfCDinIUgVEVFLUFjdGl2ZSwgQ29tbXVuaXR5IFRlc3QgfCBbUmVsZWFzZV0oaHR0cHM6Ly9naXRodWIuY29tL2JpZ2ZndXk4L1RXUlAtTGF2YS1QbGF5LVVsdHJhLWx4eDUyMS9yZWxlYXNlcy90YWcvdjMuMC1seHg1MjEpIHwKfCB2MS42LjEtc2FmZSB8IOKchSBHdWFyYW50ZWVkIEJvb3QgKG5vIFRFRSkgfCBbUmVsZWFzZV0oaHR0cHM6Ly9naXRodWIuY29tL2JpZ2ZndXk4L1RXUlAtTGF2YS1QbGF5LVVsdHJhLWx4eDUyMS9yZWxlYXNlcy90YWcvdjEuNi4xLXNhZmUtbHh4NTIxKSB8CnwgdjEuNi4wIHwg4pyFIEZsYXNoLVJlYWR5IHwgW1JlbGVhc2VdKGh0dHBzOi8vZ2l0aHViLmNvbS9iaWdmZ3V5OC9UV1JQLUxhdmEtUGxheS1VbHRyYS1seHg1MjEvcmVsZWFzZXMvdGFnL3YxLjYuMC1seHg1MjEpIHwKfCB2MS41LjEgfCDimqDvuI8gV3JvbmcgYWRkcmVzc2VzIHwgW1JlbGVhc2VdKGh0dHBzOi8vZ2l0aHViLmNvbS9iaWdmZ3V5OC9UV1JQLUxhdmEtUGxheS1VbHRyYS1seHg1MjEvcmVsZWFzZXMvdGFnL3YxLjUuMS1seHg1MjEpIHwKfCB2MS4yIHwg4p2MIEJvb3Rsb29wIHwgW1JlbGVhc2VdKGh0dHBzOi8vZ2l0aHViLmNvbS9iaWdmZ3V5OC9UV1JQLUxhdmEtUGxheS1VbHRyYS1seHg1MjEvcmVsZWFzZXMvdGFnL3YxLjItbHh4NTIxKSB8CnwgdjEuMSB8IOKchSBXb3JraW5nIGJvb3QgfCBbUmVsZWFzZV0oaHR0cHM6Ly9naXRodWIuY29tL2JpZ2ZndXk4L1RXUlAtTGF2YS1QbGF5LVVsdHJhLWx4eDUyMS9yZWxlYXNlcy90YWcvdjEuMS1seHg1MjEpIHwKfCB2MS4wIHwg4p2MIE1pc3NpbmcgZHJpdmVycyB8IFtSZWxlYXNlXShodHRwczovL2dpdGh1Yi5jb20vYmlnZmd1eTgvVFdSUC1MYXZhLVBsYXktVWx0cmEtbHh4NTIxL3JlbGVhc2VzL3RhZy92MS4wLWx4eDUyMSkgfAoKIyMgRGV2aWNlIFNwZWNzCgotIERldmljZTogTGF2YSBQbGF5IFVsdHJhIDVHCi0gQ29kZW5hbWU6IGx4eDUyMQotIFNvQzogTWVkaWFUZWsgRGltZW5zaXR5IDczMDAgKG10Njg3OCkKLSBBbmRyb2lkOiAxNSAvIFZOREsgMTQKLSBLZXJuZWw6IDYuMS4xMTUKLSBTdG9yYWdlOiBVRlMgMy4xLCBWaXJ0dWFsIEEvQgotIFRFRTogVHJ1c3RLZXJuZWwgKG5vdCBUcnVzdG9uaWMpCgojIyB2My4wIEZlYXR1cmVzCgotIFRFRS1hY3RpdmU6IHRlZWQgKyBrZXltaW50ICsgZ2F0ZWtlZXBlciBIQUxzCi0gU0VMaW51eCBwZXJtaXNzaXZlCi0gRmlsZSBjb3VudDogMzQ2NCwgaW5pdC5yZWNvdmVyeTogMTczNiBieXRlcwotIDQgVEVFIGJpbmFyaWVzLCAxMyBsaWJyYXJpZXMsIDcgLnRhIGZpbGVzCgojIyBCdWlsZAoKVXNlcyBHaXRIdWIgQWN0aW9ucyB3b3JrZmxvdyAoYC5naXRodWIvd29ya2Zsb3dzL21haW4ueW1sYCkuCgotIE1hbmlmZXN0OiBgdHdycC0xMi4xYAotIEJ1aWxkIHRpbWU6IH41OSBtaW51dGVzCi0gTHVuY2g6IGB0d3JwX2x4eDUyMS1lbmdgCgojIyMgQnVpbGQgVHJpZ2dlcnMKCi0gKipTYWZlIChubyBURUUpOioqIGBlbmFibGVfdGVlPWZhbHNlYCDihpIgZ3VhcmFudGVlZCBib290Ci0gKipURUUgZmlsZXMgcHJlc2VudCwgaW5hY3RpdmU6KiogYGVuYWJsZV90ZWU9dHJ1ZSwgdGVlX2FjdGl2YXRpb249ZmFsc2VgCi0gKipURUUgYWN0aXZlOioqIGBlbmFibGVfdGVlPXRydWUsIHRlZV9hY3RpdmF0aW9uPXRydWVgIOKGkiBURUUgc2VydmljZXMgcnVubmluZwoKIyMgVGVzdGluZwoKU2VlIFtURVNUSU5HLm1kXShURVNUSU5HLm1kKSBmb3IgdGVzdGluZyBpbnN0cnVjdGlvbnMuCgojIyBDaGFuZ2Vsb2cKClNlZSBbQ0hBTkdFTE9HLm1kXShDSEFOR0VMT0cubWQpIGZvciBmdWxsIHZlcnNpb24gaGlzdG9yeS4KCiMjIENyZWRpdHMKCi0gRGV2aWNlIHRyZWU6IGZhaGltZnJrCi0gS2VybmVsOiBTaWxpY29ueExhYgotIEJ1aWx0IHdpdGg6IEFPU1AgbWtib290aW1nLCBUV1JQIG1pbmltYWwgbWFuaWZlc3QKCiMjIFdhcm5pbmcKCioqRm9yIGFkdmFuY2VkIHVzZXJzIG9ubHkuKiogQWx3YXlzIGJhY2sgdXAgc3RvY2sgYHZlbmRvcl9ib290LmltZ2AgYmVmb3JlIGZsYXNoaW5nLgpJZiBUV1JQIGZhaWxzIHRvIGJvb3QsIGZsYXNoIHRoZSBzdG9jayBiYWNrdXAgaW1tZWRpYXRlbHk6CgpgYGAKbXRrIHcgdmVuZG9yX2Jvb3RfYSB2ZW5kb3JfYm9vdF9zdG9jay5pbWcKbXRrIHJlc2V0CmBgYAo=
+# TWRP for Lava Play Ultra 5G (lxx521)
+
+Custom TWRP recovery for **Lava Play Ultra 5G** (lxx521 / MediaTek Dimensity 7300).
+
+## Downloads
+
+| Version | Status | Link |
+|---|---|---|
+| **v3.0** | ✅ TEE-Active, Community Test | [Release](https://github.com/bigfguy8/TWRP-Lava-Play-Ultra-lxx521/releases/tag/v3.0-lxx521) |
+| v1.6.1-safe | ✅ Guaranteed Boot (no TEE) | [Release](https://github.com/bigfguy8/TWRP-Lava-Play-Ultra-lxx521/releases/tag/v1.6.1-safe-lxx521) |
+| v1.6.0 | ✅ Flash-Ready | [Release](https://github.com/bigfguy8/TWRP-Lava-Play-Ultra-lxx521/releases/tag/v1.6.0-lxx521) |
+| v1.5.1 | ⚠️ Wrong addresses | [Release](https://github.com/bigfguy8/TWRP-Lava-Play-Ultra-lxx521/releases/tag/v1.5.1-lxx521) |
+| v1.2 | ❌ Bootloop | [Release](https://github.com/bigfguy8/TWRP-Lava-Play-Ultra-lxx521/releases/tag/v1.2-lxx521) |
+| v1.1 | ✅ Working boot | [Release](https://github.com/bigfguy8/TWRP-Lava-Play-Ultra-lxx521/releases/tag/v1.1-lxx521) |
+| v1.0 | ❌ Missing drivers | [Release](https://github.com/bigfguy8/TWRP-Lava-Play-Ultra-lxx521/releases/tag/v1.0-lxx521) |
+
+## Device Specs
+
+- Device: Lava Play Ultra 5G
+- Codename: lxx521
+- SoC: MediaTek Dimensity 7300 (mt6878)
+- Android: 15 / VNDK 14
+- Kernel: 6.1.115
+- Storage: UFS 3.1, Virtual A/B
+- TEE: TrustKernel (not Trustonic)
+
+## v3.0 Features
+
+- TEE-active: teed + keymint + gatekeeper HALs
+- SELinux permissive
+- File count: 3464, init.recovery: 1736 bytes
+- 4 TEE binaries, 13 libraries, 7 .ta files
+
+## Build
+
+Uses GitHub Actions workflow (`.github/workflows/main.yml`).
+
+- Manifest: `twrp-12.1`
+- Build time: ~59 minutes
+- Lunch: `twrp_lxx521-eng`
+
+### Build Triggers
+
+- **Safe (no TEE):** `enable_tee=false` → guaranteed boot
+- **TEE files present, inactive:** `enable_tee=true, tee_activation=false`
+- **TEE active:** `enable_tee=true, tee_activation=true` → TEE services running
+
+## Testing
+
+See [TESTING.md](TESTING.md) for testing instructions.
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for full version history.
+
+## Credits
+
+- Device tree: fahimfrk
+- Kernel: SiliconxLab
+- Built with: AOSP mkbootimg, TWRP minimal manifest
+
+## Warning
+
+**For advanced users only.** Always back up stock `vendor_boot.img` before flashing.
+If TWRP fails to boot, flash the stock backup immediately:
+
+```
+mtk w vendor_boot_a vendor_boot_stock.img
+mtk reset
+```
