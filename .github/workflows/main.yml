@@ -1,4 +1,4 @@
-﻿name: Build TWRP (Verify-First)
+name: Build TWRP (Verify-First)
 
 on:
   workflow_dispatch:
@@ -169,7 +169,7 @@ jobs:
           cp $TEE/lib64/*.so $RAMDISK/vendor/lib64/
           # Copy init scripts
           # TEE mode: SKIP stock .rc (our init.recovery.mt6878.rc defines all services)
-          # Safe mode: rename .rc â†’ .disabled
+          # Safe mode: rename .rc → .disabled
           if [ "${{ inputs.tee_activation }}" = "true" ]; then
             echo "  TEE MODE: Skipping stock .rc copy (our init defines all)"
           else
@@ -182,7 +182,7 @@ jobs:
           fi
           # VINTF manifests
           # TEE mode: SKIP stock (our init handles HALs)
-          # Safe mode: rename .xml â†’ .disabled
+          # Safe mode: rename .xml → .disabled
           if [ "${{ inputs.tee_activation }}" = "true" ]; then
             echo "  TEE MODE: Skipping stock VINTF copy"
           else
@@ -344,4 +344,3 @@ jobs:
           files: |
             release-files/twrp_lxx521_${{ inputs.version }}.img
             release-files/SHA256SUMS
-
