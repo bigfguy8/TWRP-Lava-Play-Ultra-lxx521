@@ -1,1 +1,74 @@
-IyBUV1JQIFRlc3RpbmcgR3VpZGUg4oCUIExhdmEgUGxheSBVbHRyYSA1RyAobHh4NTIxKQoKIyMgTGF0ZXN0IFJlbGVhc2UKLSAqKnYzLjAqKiAoVEVFLWFjdGl2ZSwgY29tbXVuaXR5IHRlc3QpOiBodHRwczovL2dpdGh1Yi5jb20vYmlnZmd1eTgvVFdSUC1MYXZhLVBsYXktVWx0cmEtbHh4NTIxL3JlbGVhc2VzL3RhZy92My4wLWx4eDUyMQotIHYxLjYuMS1zYWZlIChndWFyYW50ZWVkIGJvb3QsIG5vIFRFRSk6IGh0dHBzOi8vZ2l0aHViLmNvbS9iaWdmZ3V5OC9UV1JQLUxhdmEtUGxheS1VbHRyYS1seHg1MjEvcmVsZWFzZXMvdGFnL3YxLjYuMS1zYWZlLWx4eDUyMQoKIyMgQmVmb3JlIEZsYXNoaW5nCjEuIEJhdHRlcnkgPj0gNzAlCjIuIEJhY2t1cCBzdG9jayBgdmVuZG9yX2Jvb3QuaW1nYCDigJQgKipTSEEyNTY6IGA0MjQyYjU2MDBkNWQuLi5gKioKMy4gQmFja3VwIHN0b2NrIGB2Ym1ldGEqLmltZ2AKNC4gSGF2ZSBtdGtjbGllbnQgb3IgU1AgRmxhc2ggVG9vbCByZWFkeSBmb3IgcmVjb3ZlcnkKCiMjIEZsYXNoCi0gYG10ayB3IHZlbmRvcl9ib290X2EgdHdycF9seHg1MjFfdjMuMC5pbWdgIOKGkiBgbXRrIHJlc2V0YAotIERvICoqTk9UKiogZmxhc2ggdG8gcmVjb3ZlcnkgcGFydGl0aW9uLgoKIyMgUG9zdC1GbGFzaCBUZXN0IE1hdHJpeAoKfCAjIHwgVGVzdCB8IEV4cGVjdGVkIChQQVNTKSB8IEZhaWwgTWVhbmluZyB8CnwtLS18LS0tLS0tfC0tLS0tLXwtLS18CnwgMSB8IFBob25lIGJvb3RzIGludG8gVFdSUCB8IFRXUlAgVUksIG5vIGJvb3Rsb29wIHwgQm9vdGxvb3Ag4oaSIGZsYXNoIHN0b2NrIHwKfCAyIHwgVG91Y2ggd29ya3MgfCBSZXNwb25zaXZlIHwgVFdSUCB0b3VjaCBtaXNzaW5nIHwKfCAzIHwgKipJbnRlcm5hbCBTdG9yYWdlKiogfCBTaG93cyByZWFsIEdCLCAqKk5PVCAwTUIqKiB8IDBNQiA9IFRFRSBmYWlsIHwKfCA0IHwgRkJFIGRlY3J5cHQgfCBGaWxlcyB2aXNpYmxlIGluIEludGVybmFsIFN0b3JhZ2UgfCBEYXRhIG5vdCBkZWNyeXB0ZWQgfAp8IDUgfCBCYWNrdXAgLyBSZXN0b3JlIHwgV29ya3MgdG8gU0QgLyBPVEcgfCBGZWF0dXJlIGJyb2tlbiB8CnwgNiB8IEFEQiBzaWRlbG9hZCB8IGBhZGIgc2lkZWxvYWRgIHdvcmtzIHwgTm90IHN1cHBvcnRlZCB8CnwgNyB8IE9URyBtb3VudCB8IFVTQiBzdGljayBhY2Nlc3NpYmxlIHwgU3RvcmFnZSBpbml0IG1pc3NpbmcgfAp8IDggfCBSZWJvb3QgdG8gc3lzdGVtIHwgQm9vdHMgYmFjayB0byBBbmRyb2lkIHwgQm9vdGNoYWluIGJyb2tlbiB8CgojIyBUSEUgS0VZIFRFRSBURVNUICh2My4wKQoKQWZ0ZXIgZmxhc2hpbmcsIG9wZW4gVFdSUCDihpIgKipJbnN0YWxsIOKGkiBTZWxlY3QgU3RvcmFnZSDihpIgSW50ZXJuYWwgU3RvcmFnZSoqOgotICoqME1CKiog4oaSIFRFRSBmYWlsIOKGkiBjb2xsZWN0IGxvZyAoYmVsb3cpCi0gKipSZWFsIHNpemUqKiDihpIgVEVFIHdvcmtpbmcg4oaSIHN1Y2Nlc3MKCiMjIExvZyBDb2xsZWN0aW9uCgpgYGBiYXNoCiMgUHVsbCByZWNvdmVyeSBsb2cKYWRiIHB1bGwgL3RtcC9yZWNvdmVyeS5sb2cKCiMgVEVFLXNwZWNpZmljIGxvZwphZGIgcHVsbCAvdG1wL3JlY292ZXJ5X3RlZS5sb2cKYGBgCgojIyBURUUgU3RhdHVzIENoZWNrIChmcm9tIHNoZWxsIC8gVFdSUCB0ZXJtaW5hbCkKCmBgYGJhc2gKIyBWZXJpZnkgdGVlZCBydW5uaW5nCmdldHByb3AgfCBncmVwIC1pIHRydXN0a2VybmVsCmdldHByb3AgfCBncmVwIC1pIHRlZWQKCiMgVmVyaWZ5IGtleW1pbnQgKyBnYXRla2VlcGVyCmdldHByb3AgfCBncmVwIGtleW1pbnQKZ2V0cHJvcCB8IGdyZXAgZ2F0ZWtlZXBlcgpgYGAKCiMjIFJlY292ZXJ5IGlmIEZhaWwKCmBgYGJhc2gKbXRrIHcgdmVuZG9yX2Jvb3RfYSB2ZW5kb3JfYm9vdF9zdG9jay5pbWcKbXRrIHJlc2V0CmBgYAoKIyMgUmVwb3J0IElzc3VlcwoKQ3JlYXRlIGFuIGlzc3VlOiBodHRwczovL2dpdGh1Yi5jb20vYmlnZmd1eTgvVFdSUC1MYXZhLVBsYXktVWx0cmEtbHh4NTIxL2lzc3VlcwoKSW5jbHVkZToKLSBCdWlsZCB2ZXJzaW9uICsgU0hBMjU2Ci0gQm9vdCBzdGF0dXMgKFBBU1MvRkFJTCkKLSBJbnRlcm5hbCBzdG9yYWdlIHNpemUgKDBNQiBvciByZWFsIE1CKQotIGByZWNvdmVyeS5sb2dgICsgYHJlY292ZXJ5X3RlZS5sb2dgCi0gU2NyZWVuc2hvdHMK
+# TWRP Testing Guide — Lava Play Ultra 5G (lxx521)
+
+## Latest Release
+- **v3.0** (TEE-active, community test): https://github.com/bigfguy8/TWRP-Lava-Play-Ultra-lxx521/releases/tag/v3.0-lxx521
+- v1.6.1-safe (guaranteed boot, no TEE): https://github.com/bigfguy8/TWRP-Lava-Play-Ultra-lxx521/releases/tag/v1.6.1-safe-lxx521
+
+## Before Flashing
+1. Battery >= 70%
+2. Backup stock `vendor_boot.img` — **SHA256: `4242b5600d5d...`**
+3. Backup stock `vbmeta*.img`
+4. Have mtkclient or SP Flash Tool ready for recovery
+
+## Flash
+- `mtk w vendor_boot_a twrp_lxx521_v3.0.img` → `mtk reset`
+- Do **NOT** flash to recovery partition.
+
+## Post-Flash Test Matrix
+
+| # | Test | Expected (PASS) | Fail Meaning |
+|---|------|------|---|
+| 1 | Phone boots into TWRP | TWRP UI, no bootloop | Bootloop → flash stock |
+| 2 | Touch works | Responsive | TWRP touch missing |
+| 3 | **Internal Storage** | Shows real GB, **NOT 0MB** | 0MB = TEE fail |
+| 4 | FBE decrypt | Files visible in Internal Storage | Data not decrypted |
+| 5 | Backup / Restore | Works to SD / OTG | Feature broken |
+| 6 | ADB sideload | `adb sideload` works | Not supported |
+| 7 | OTG mount | USB stick accessible | Storage init missing |
+| 8 | Reboot to system | Boots back to Android | Bootchain broken |
+
+## THE KEY TEE TEST (v3.0)
+
+After flashing, open TWRP → **Install → Select Storage → Internal Storage**:
+- **0MB** → TEE fail → collect log (below)
+- **Real size** → TEE working → success
+
+## Log Collection
+
+```bash
+# Pull recovery log
+adb pull /tmp/recovery.log
+
+# TEE-specific log
+adb pull /tmp/recovery_tee.log
+```
+
+## TEE Status Check (from shell / TWRP terminal)
+
+```bash
+# Verify teed running
+getprop | grep -i trustkernel
+getprop | grep -i teed
+
+# Verify keymint + gatekeeper
+getprop | grep keymint
+getprop | grep gatekeeper
+```
+
+## Recovery if Fail
+
+```bash
+mtk w vendor_boot_a vendor_boot_stock.img
+mtk reset
+```
+
+## Report Issues
+
+Create an issue: https://github.com/bigfguy8/TWRP-Lava-Play-Ultra-lxx521/issues
+
+Include:
+- Build version + SHA256
+- Boot status (PASS/FAIL)
+- Internal storage size (0MB or real MB)
+- `recovery.log` + `recovery_tee.log`
+- Screenshots
