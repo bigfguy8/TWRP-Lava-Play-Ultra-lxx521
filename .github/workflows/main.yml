@@ -1,6 +1,16 @@
 name: Build TWRP (Verify-First)
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/main.yml"
+      - ".github/scripts/**"
+      - "stock-files/**"
+      - "tee-files/**"
+    tags:
+      - "v*"
   workflow_dispatch:
     inputs:
       version:
@@ -17,7 +27,7 @@ on:
         default: false
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -31,9 +41,22 @@ jobs:
         with:
           fetch-depth: 1
 
+      - name: Set Build Variables
+        id: vars
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ inputs.version }}" >> "$GITHUB_OUTPUT"
+            echo "enable_tee=${{ inputs.enable_tee }}" >> "$GITHUB_OUTPUT"
+            echo "tee_activation=${{ inputs.tee_activation }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "version=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+            echo "enable_tee=false" >> "$GITHUB_OUTPUT"
+            echo "tee_activation=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Pre-flight File Check
         run: |
-          if [ "${{ inputs.tee_activation }}" = "true" ] && [ "${{ inputs.enable_tee }}" = "false" ]; then
+          if [ "${{ steps.vars.outputs.tee_activation }}" = "true" ] && [ "${{ steps.vars.outputs.enable_tee }}" = "false" ]; then
             echo "::error::tee_activation=true but enable_tee=false. TEE activation requires TEE file injection."
             exit 1
           fi
@@ -57,7 +80,7 @@ jobs:
           sha256sum -c SHA256SUMS
           cd "${{ github.workspace }}"
 
-          if [ "${{ inputs.enable_tee }}" = "true" ]; then
+          if [ "${{ steps.vars.outputs.enable_tee }}" = "true" ]; then
             for d in bin bin-hw lib64 etc-init etc-vintf app-t6; do
               [ -d "${{ github.workspace }}/tee-files/$d" ] || {
                 echo "::error::Missing: tee-files/$d"
@@ -66,7 +89,7 @@ jobs:
             done
           fi
 
-          if [ "${{ inputs.tee_activation }}" = "true" ] && [ ! -f "${{ github.workspace }}/tee-files/etc-init/init.recovery.mt6878.rc.tee" ]; then
+          if [ "${{ steps.vars.outputs.tee_activation }}" = "true" ] && [ ! -f "${{ github.workspace }}/tee-files/etc-init/init.recovery.mt6878.rc.tee" ]; then
             echo "::error::TEE activation requested, but init file is missing"
             exit 1
           fi
@@ -155,7 +178,7 @@ jobs:
           echo "Files: $(find /tmp/ramdisk_root -type f | wc -l)"
 
       - name: Inject TEE
-        if: ${{ inputs.enable_tee }}
+        if: ${{ steps.vars.outputs.enable_tee == 'true' }}
         run: |
           set -e
           RAMDISK=/tmp/ramdisk_root
@@ -184,7 +207,7 @@ jobs:
           cp "$TEE/bin-hw/"* "$RAMDISK/vendor/bin/hw/"
           cp "$TEE/lib64/"*.so "$RAMDISK/vendor/lib64/"
 
-          if [ "${{ inputs.tee_activation }}" = "true" ]; then
+          if [ "${{ steps.vars.outputs.tee_activation }}" = "true" ]; then
             echo "TEE MODE: Skipping stock init and VINTF copies"
           else
             for rc_file in "$TEE/etc-init/"*.rc; do
@@ -210,7 +233,7 @@ jobs:
           find "$RAMDISK/vendor/app/t6/data" -type d -exec chmod 0755 {} ; 2>/dev/null || true
           find "$RAMDISK/vendor/app/t6/data" -type f -exec chmod 0644 {} ; 2>/dev/null || true
 
-          if [ "${{ inputs.tee_activation }}" = "true" ] && [ -f "$TEE/etc-init/init.recovery.mt6878.rc.tee" ]; then
+          if [ "${{ steps.vars.outputs.tee_activation }}" = "true" ] && [ -f "$TEE/etc-init/init.recovery.mt6878.rc.tee" ]; then
             cp "$TEE/etc-init/init.recovery.mt6878.rc.tee" "$RAMDISK/init.recovery.mt6878.rc"
             echo "TEE ACTIVATION: init.recovery replaced with TEE version"
           else
@@ -312,7 +335,7 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: twrp-${{ inputs.version }}-${{ github.run_id }}
+          name: twrp-${{ steps.vars.outputs.version }}-${{ github.run_id }}
           path: /tmp/artifact/
           retention-days: 14
           if-no-files-found: error
@@ -334,7 +357,7 @@ jobs:
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
-          name: twrp-${{ inputs.version }}-${{ github.run_id }}
+          name: twrp-${{ needs.build.outputs.version }}-${{ github.run_id }}
           path: artifact
 
       - name: Verify Artifact
@@ -350,3 +373,31 @@ jobs:
           [ "$SIZE" -le 67108864 ] || { echo "::error::vendor_boot.img too large"; exit 1; }
 
           echo "Independent verification passed"
+
+  release:
+    name: Create GitHub Release
+    needs: verify
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Download Verified Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: twrp-${{ github.ref_name }}-${{ github.run_id }}
+          path: artifact
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: TWRP ${{ github.ref_name }} for Lava Play Ultra 5G (LXX521)
+          body: |
+            Unofficial TWRP build for Lava Play Ultra 5G (LXX521 / MT6878).
+
+            **Warning:** Unlocking the bootloader may erase data. Always keep a stock `vendor_boot.img` backup.
+
+            Verify `SHA256SUMS` before flashing.
+          files: |
+            artifact/vendor_boot.img
+            artifact/SHA256SUMS
