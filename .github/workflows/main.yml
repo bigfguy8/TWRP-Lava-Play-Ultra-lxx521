@@ -21,7 +21,7 @@ on:
         default: false
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build:
@@ -53,12 +53,12 @@ jobs:
             echo "Verifying stock file checksums via stock-files/SHA256SUMS..."
             cd "${{ github.workspace }}/stock-files"
             if ! sha256sum -c SHA256SUMS; then
-              echo "WARNING: SHA256SUMS format/mismatch detected. Skipping checksum verification."
+              echo "::error::Stock file SHA256 verification failed"; exit 1
             fi
             cd "${{ github.workspace }}"
             echo "Stock file checksum step completed"
           else
-            echo "WARNING: stock-files/SHA256SUMS not found. Building without checksum verification."
+            echo "::error::stock-files/SHA256SUMS missing; refusing unverified build"; exit 1
           fi
 
           if [ "${{ inputs.enable_tee }}" = "true" ]; then
@@ -67,6 +67,10 @@ jobs:
             done
           fi
 
+          if [ "${{ inputs.tee_activation }}" = "true" ] && [ ! -f "${{ github.workspace }}/tee-files/etc-init/init.recovery.mt6878.rc.tee" ]; then
+            echo "::error::TEE activation requested, but init file is missing"
+            exit 1
+          fi
       - name: Free Disk Space
         run: |
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
@@ -126,7 +130,7 @@ jobs:
           BUILT_VB=$(find out/target/product/lxx521 -name "vendor_boot.img" -type f | head -1)
           [ -z "$BUILT_VB" ] && { echo "::error::vendor_boot.img not found"; exit 1; }
           mkdir -p /tmp/built
-          python3 ${{ env.UNPACK_TOOL }} --boot_img "$BUILT_VB" --out /tmp/built
+          python3 "$UNPACK_TOOL" --boot_img "$BUILT_VB" --out /tmp/built
           cp /tmp/built/vendor_ramdisk01 /tmp/ramdisk01.lz4
           ls -lh /tmp/ramdisk01.lz4
 
@@ -140,7 +144,7 @@ jobs:
           echo "Files: $(find /tmp/ramdisk_root -type f | wc -l)"
 
       - name: Inject TEE
-        if: ${{ inputs.enable_tee == 'true' }}
+        if: ${{ inputs.enable_tee }}
         run: |
           set -e
           RAMDISK=/tmp/ramdisk_root
@@ -220,7 +224,7 @@ jobs:
         run: |
           cp ${{ github.workspace }}/stock-files/vendor_ramdisk00.lz4 /tmp/v00.lz4
           cp ${{ github.workspace }}/stock-files/dtb.img /tmp/dtb.img
-          python3 ${{ env.MKBOOT_TOOL }} \
+          python3 "$MKBOOT_TOOL" \
             --header_version 4 --pagesize 4096 --base 0x00000000 \
             --kernel_offset 0x40000000 --ramdisk_offset 0x66f00000 \
             --tags_offset 0x47c80000 --dtb_offset 0x47c80000 \
@@ -305,6 +309,8 @@ jobs:
 
   release:
     name: Create Release
+    permissions:
+      contents: write
     needs: [build, verify]
     if: ${{ inputs.create_release == true }}
     runs-on: ubuntu-22.04
@@ -315,10 +321,16 @@ jobs:
           name: twrp-${{ inputs.version }}-${{ github.run_id }}
           path: release-files
       - name: Prepare
+        env:
+          VERSION: ${{ inputs.version }}
         run: |
+          if [[ ! "$VERSION" =~ ^[A-Za-z0-9][A-Za-z0-9._-]*$ ]]; then
+            echo "::error::Invalid version; use letters, digits, dots, underscores, or hyphens"
+            exit 1
+          fi
           cd release-files
-          mv vendor_boot.img twrp_lxx521_${{ inputs.version }}.img
-          sha256sum twrp_lxx521_${{ inputs.version }}.img > SHA256SUMS
+          mv vendor_boot.img "twrp_lxx521_${VERSION}.img"
+          sha256sum "twrp_lxx521_${VERSION}.img" > SHA256SUMS
           ls -lh
       - name: Create Release
         uses: softprops/action-gh-release@v1
