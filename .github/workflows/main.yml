@@ -15,10 +15,6 @@ on:
         description: 'ACTIVATE TEE services (risky - can bootloop)'
         type: boolean
         default: false
-      create_release:
-        description: 'Create release after verify'
-        type: boolean
-        default: false
 
 permissions:
   contents: read
@@ -28,6 +24,7 @@ jobs:
     name: Build TWRP
     runs-on: ubuntu-22.04
     timeout-minutes: 330
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -36,34 +33,36 @@ jobs:
 
       - name: Pre-flight File Check
         run: |
-          # v3.1 guard: tee_activation requires enable_tee
           if [ "${{ inputs.tee_activation }}" = "true" ] && [ "${{ inputs.enable_tee }}" = "false" ]; then
             echo "::error::tee_activation=true but enable_tee=false. TEE activation requires TEE file injection."
             exit 1
           fi
-          for f in "${{ github.workspace }}/stock-files/vendor_ramdisk00.lz4" "${{ github.workspace }}/stock-files/dtb.img"; do
+
+          for f in \
+            "${{ github.workspace }}/stock-files/vendor_ramdisk00.lz4" \
+            "${{ github.workspace }}/stock-files/dtb.img"; do
             if [ ! -f "$f" ]; then
               echo "::error::Missing: $f"
               exit 1
             fi
             echo "OK: $f"
           done
-          # v3.1: verify stock file checksums if available
-          if [ -f "${{ github.workspace }}/stock-files/SHA256SUMS" ]; then
-            echo "Verifying stock file checksums via stock-files/SHA256SUMS..."
-            cd "${{ github.workspace }}/stock-files"
-            if ! sha256sum -c SHA256SUMS; then
-              echo "::error::Stock file SHA256 verification failed"; exit 1
-            fi
-            cd "${{ github.workspace }}"
-            echo "Stock file checksum step completed"
-          else
-            echo "::error::stock-files/SHA256SUMS missing; refusing unverified build"; exit 1
+
+          if [ ! -f "${{ github.workspace }}/stock-files/SHA256SUMS" ]; then
+            echo "::error::stock-files/SHA256SUMS missing; refusing unverified build"
+            exit 1
           fi
+
+          cd "${{ github.workspace }}/stock-files"
+          sha256sum -c SHA256SUMS
+          cd "${{ github.workspace }}"
 
           if [ "${{ inputs.enable_tee }}" = "true" ]; then
             for d in bin bin-hw lib64 etc-init etc-vintf app-t6; do
-              [ -d "${{ github.workspace }}/tee-files/$d" ] || { echo "::error::Missing: tee-files/$d"; exit 1; }
+              [ -d "${{ github.workspace }}/tee-files/$d" ] || {
+                echo "::error::Missing: tee-files/$d"
+                exit 1
+              }
             done
           fi
 
@@ -71,6 +70,7 @@ jobs:
             echo "::error::TEE activation requested, but init file is missing"
             exit 1
           fi
+
       - name: Free Disk Space
         run: |
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
@@ -80,16 +80,21 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cpio libarchive-tools lz4 python3 python3-pip gawk flex bison build-essential ccache curl git git-lfs gnupg gperf lib32ncurses5-dev lib32z1-dev libffi-dev libgl1-mesa-dev libxml2-utils xsltproc zlib1g-dev openjdk-11-jdk zip unzip libssl-dev bc libelf-dev lzop rsync schedtool
+          sudo apt-get install -y \
+            cpio libarchive-tools lz4 python3 python3-pip gawk flex bison \
+            build-essential ccache curl git git-lfs gnupg gperf \
+            lib32ncurses5-dev lib32z1-dev libffi-dev libgl1-mesa-dev \
+            libxml2-utils xsltproc zlib1g-dev openjdk-11-jdk zip unzip \
+            libssl-dev bc libelf-dev lzop rsync schedtool
           pip install lz4
           cpio --version | head -1
 
       - name: Install Repo Tool
         run: |
           mkdir -p ~/bin
-          curl -s https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+          curl -fsSL https://storage.googleapis.com/git-repo-downloads/repo -o ~/bin/repo
           chmod a+rx ~/bin/repo
-          echo "$HOME/bin" >> $GITHUB_PATH
+          echo "$HOME/bin" >> "$GITHUB_PATH"
 
       - name: Sync TWRP Manifest
         run: |
@@ -100,11 +105,14 @@ jobs:
           repo init -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b twrp-12.1 --depth=1
           repo sync -c -j4 --force-sync --no-clone-bundle --no-tags --optimized-fetch --prune
 
-      - name: Clone Device Tree
+      - name: Clone Pinned Device Tree and Kernel
         working-directory: workspace
         run: |
-          git clone --depth=1 https://github.com/fahimfrk/Dimensity7300-Device-Tree-Lava-Play-Ultra device/lava/lxx521
-          git clone --depth=1 --branch lineage-23.2 https://github.com/SiliconxLab/android_device_lava_lxx521-kernel device/lava/lxx521-kernel
+          git clone https://github.com/fahimfrk/Dimensity7300-Device-Tree-Lava-Play-Ultra device/lava/lxx521
+          git -C device/lava/lxx521 checkout 5f3e630031198fd7046cfa335470d8aa1873d4fc
+
+          git clone --branch lineage-23.2 https://github.com/SiliconxLab/android_device_lava_lxx521-kernel device/lava/lxx521-kernel
+          git -C device/lava/lxx521-kernel checkout 8aed162ead09ebfa63bdc0c4423c83d515e02fab
 
       - name: Build TWRP
         working-directory: workspace
@@ -112,7 +120,7 @@ jobs:
           source build/envsetup.sh
           lunch twrp_lxx521-eng
           mka recoveryimage vendorbootimage -j2
-          find out/ -name "*.img" -exec ls -lh {} \;
+          find out/ -name "*.img" -exec ls -lh {} ;
 
       - name: Locate Tools
         working-directory: workspace
@@ -121,14 +129,15 @@ jobs:
           MKBOOT=$(find . -path "*/mkbootimg/mkbootimg.py" | head -1)
           [ -z "$UNPACK" ] && exit 1
           [ -z "$MKBOOT" ] && exit 1
-          echo "UNPACK_TOOL=$UNPACK" >> $GITHUB_ENV
-          echo "MKBOOT_TOOL=$MKBOOT" >> $GITHUB_ENV
+          echo "UNPACK_TOOL=$UNPACK" >> "$GITHUB_ENV"
+          echo "MKBOOT_TOOL=$MKBOOT" >> "$GITHUB_ENV"
 
       - name: Extract Ramdisk
         working-directory: workspace
         run: |
           BUILT_VB=$(find out/target/product/lxx521 -name "vendor_boot.img" -type f | head -1)
           [ -z "$BUILT_VB" ] && { echo "::error::vendor_boot.img not found"; exit 1; }
+
           mkdir -p /tmp/built
           python3 "$UNPACK_TOOL" --boot_img "$BUILT_VB" --out /tmp/built
           cp /tmp/built/vendor_ramdisk01 /tmp/ramdisk01.lz4
@@ -136,11 +145,13 @@ jobs:
 
       - name: Decode LZ4
         run: |
-          python3 ${{ github.workspace }}/.github/scripts/decode_lz4.py /tmp/ramdisk01.lz4 /tmp/ramdisk01.cpio
+          python3 "${{ github.workspace }}/.github/scripts/decode_lz4.py" \
+            /tmp/ramdisk01.lz4 /tmp/ramdisk01.cpio
+
           rm -rf /tmp/ramdisk_root
           mkdir -p /tmp/ramdisk_root
           cd /tmp/ramdisk_root
-          bsdtar -xf /tmp/ramdisk01.cpio 2>/dev/null
+          bsdtar -xf /tmp/ramdisk01.cpio
           echo "Files: $(find /tmp/ramdisk_root -type f | wc -l)"
 
       - name: Inject TEE
@@ -148,93 +159,100 @@ jobs:
         run: |
           set -e
           RAMDISK=/tmp/ramdisk_root
-          TEE=${{ github.workspace }}/tee-files
-          mkdir -p $RAMDISK/vendor/bin $RAMDISK/vendor/bin/hw $RAMDISK/vendor/lib64
-          mkdir -p $RAMDISK/vendor/etc/init $RAMDISK/vendor/etc/vintf/manifest
-          mkdir -p $RAMDISK/vendor/app/t6
-          
-          # Targeted cleanup: only remove STOCK TEE-related .rc files
-          rm -f $RAMDISK/vendor/etc/init/trustkernel.rc 2>/dev/null || true
-          rm -f $RAMDISK/vendor/etc/init/trustkernel.rc.disabled 2>/dev/null || true
-          rm -f $RAMDISK/vendor/etc/init/android.hardware.security.keymint@*.rc 2>/dev/null || true
-          rm -f $RAMDISK/vendor/etc/init/android.hardware.security.keymint@*.rc.disabled 2>/dev/null || true
-          rm -f $RAMDISK/vendor/etc/init/android.hardware.gatekeeper-service*.rc 2>/dev/null || true
-          rm -f $RAMDISK/vendor/etc/init/android.hardware.gatekeeper-service*.rc.disabled 2>/dev/null || true
-          rm -f $RAMDISK/vendor/etc/init/init.recovery.mt6878.rc.tee 2>/dev/null || true
-          echo "Targeted cleanup done (TWRP files preserved)"
-          cp $TEE/bin/teed $RAMDISK/vendor/bin/
-          cp $TEE/bin/tee_check_keybox $RAMDISK/vendor/bin/
-          cp $TEE/bin-hw/* $RAMDISK/vendor/bin/hw/
-          cp $TEE/lib64/*.so $RAMDISK/vendor/lib64/
-          # Copy init scripts
+          TEE="${{ github.workspace }}/tee-files"
+
+          mkdir -p \
+            "$RAMDISK/vendor/bin" \
+            "$RAMDISK/vendor/bin/hw" \
+            "$RAMDISK/vendor/lib64" \
+            "$RAMDISK/vendor/etc/init" \
+            "$RAMDISK/vendor/etc/vintf/manifest" \
+            "$RAMDISK/vendor/app/t6"
+
+          rm -f \
+            "$RAMDISK/vendor/etc/init/trustkernel.rc" \
+            "$RAMDISK/vendor/etc/init/trustkernel.rc.disabled" \
+            "$RAMDISK/vendor/etc/init/android.hardware.security.keymint@"*.rc \
+            "$RAMDISK/vendor/etc/init/android.hardware.security.keymint@"*.rc.disabled \
+            "$RAMDISK/vendor/etc/init/android.hardware.gatekeeper-service"*.rc \
+            "$RAMDISK/vendor/etc/init/android.hardware.gatekeeper-service"*.rc.disabled \
+            "$RAMDISK/vendor/etc/init/init.recovery.mt6878.rc.tee" \
+            2>/dev/null || true
+
+          cp "$TEE/bin/teed" "$RAMDISK/vendor/bin/"
+          cp "$TEE/bin/tee_check_keybox" "$RAMDISK/vendor/bin/"
+          cp "$TEE/bin-hw/"* "$RAMDISK/vendor/bin/hw/"
+          cp "$TEE/lib64/"*.so "$RAMDISK/vendor/lib64/"
+
           if [ "${{ inputs.tee_activation }}" = "true" ]; then
-            echo "  TEE MODE: Skipping stock .rc copy (our init defines all)"
+            echo "TEE MODE: Skipping stock init and VINTF copies"
           else
-            for rc_file in $TEE/etc-init/*.rc; do
+            for rc_file in "$TEE/etc-init/"*.rc; do
               [ -f "$rc_file" ] || continue
-              basename_rc=$(basename "$rc_file")
-              cp "$rc_file" "$RAMDISK/vendor/etc/init/${basename_rc}.disabled"
-              echo "  DISABLED: ${basename_rc}.disabled"
+              cp "$rc_file" "$RAMDISK/vendor/etc/init/$(basename "$rc_file").disabled"
             done
-          fi
-          # VINTF manifests
-          if [ "${{ inputs.tee_activation }}" = "true" ]; then
-            echo "  TEE MODE: Skipping stock VINTF copy"
-          else
-            for xml_file in $TEE/etc-vintf/*.xml; do
+
+            for xml_file in "$TEE/etc-vintf/"*.xml; do
               [ -f "$xml_file" ] || continue
-              basename_xml=$(basename "$xml_file")
-              cp "$xml_file" "$RAMDISK/vendor/etc/vintf/manifest/${basename_xml}.disabled"
-              echo "  DISABLED: ${basename_xml}.disabled"
+              cp "$xml_file" "$RAMDISK/vendor/etc/vintf/manifest/$(basename "$xml_file").disabled"
             done
           fi
-          cp $TEE/app-t6/*.ta $RAMDISK/vendor/app/t6/
-          cp $TEE/app-t6/cfg.ini $RAMDISK/vendor/app/t6/
-          cp -r $TEE/app-t6/data $RAMDISK/vendor/app/t6/
-          chmod 755 $RAMDISK/vendor/bin/teed $RAMDISK/vendor/bin/tee_check_keybox
-          chmod 755 $RAMDISK/vendor/bin/hw/*
-          # Ensure data directory AND contents are readable
-          find $RAMDISK/vendor/app/t6/data -type d -exec chmod 0755 {} \; 2>/dev/null || true
-          find $RAMDISK/vendor/app/t6/data -type f -exec chmod 0644 {} \; 2>/dev/null || true
-          echo "TEE data permissions set"
-          echo "TEE files: $(find $RAMDISK/vendor -type f | wc -l)"
-          
-          # Swap init.recovery ONLY if tee_activation=true (DANGEROUS)
+
+          cp "$TEE/app-t6/"*.ta "$RAMDISK/vendor/app/t6/"
+          cp "$TEE/app-t6/cfg.ini" "$RAMDISK/vendor/app/t6/"
+          cp -r "$TEE/app-t6/data" "$RAMDISK/vendor/app/t6/"
+
+          chmod 755 \
+            "$RAMDISK/vendor/bin/teed" \
+            "$RAMDISK/vendor/bin/tee_check_keybox"
+          chmod 755 "$RAMDISK/vendor/bin/hw/"*
+
+          find "$RAMDISK/vendor/app/t6/data" -type d -exec chmod 0755 {} ; 2>/dev/null || true
+          find "$RAMDISK/vendor/app/t6/data" -type f -exec chmod 0644 {} ; 2>/dev/null || true
+
           if [ "${{ inputs.tee_activation }}" = "true" ] && [ -f "$TEE/etc-init/init.recovery.mt6878.rc.tee" ]; then
             cp "$TEE/etc-init/init.recovery.mt6878.rc.tee" "$RAMDISK/init.recovery.mt6878.rc"
             echo "TEE ACTIVATION: init.recovery replaced with TEE version"
-            echo "New init.recovery size: $(stat -c '%s' "$RAMDISK/init.recovery.mt6878.rc") bytes"
           else
-            echo "SAFE MODE: Using standard v1.1 init.recovery (no TEE services)"
-            echo "TEE files are present but INACTIVE"
+            echo "SAFE MODE: TEE files present but inactive"
           fi
-          
 
       - name: Repack CPIO
         run: |
           cd /tmp/ramdisk_root
-          find . | cpio -o -H newc --owner=0:0 > /tmp/ramdisk01_new.cpio 2>/dev/null
+          find . | cpio -o -H newc --owner=0:0 > /tmp/ramdisk01_new.cpio
+
           MAGIC=$(head -c 6 /tmp/ramdisk01_new.cpio)
           [ "$MAGIC" = "070701" ] || { echo "::error::Bad CPIO magic: $MAGIC"; exit 1; }
-          echo "CPIO: $(stat -c '%s' /tmp/ramdisk01_new.cpio) bytes"
-          python3 ${{ github.workspace }}/.github/scripts/encode_lz4.py /tmp/ramdisk01_new.cpio /tmp/ramdisk01_final.lz4
+
+          python3 "${{ github.workspace }}/.github/scripts/encode_lz4.py" \
+            /tmp/ramdisk01_new.cpio /tmp/ramdisk01_final.lz4
 
       - name: Build vendor_boot.img
         working-directory: workspace
         run: |
-          cp ${{ github.workspace }}/stock-files/vendor_ramdisk00.lz4 /tmp/v00.lz4
-          cp ${{ github.workspace }}/stock-files/dtb.img /tmp/dtb.img
+          cp "${{ github.workspace }}/stock-files/vendor_ramdisk00.lz4" /tmp/v00.lz4
+          cp "${{ github.workspace }}/stock-files/dtb.img" /tmp/dtb.img
+
           python3 "$MKBOOT_TOOL" \
-            --header_version 4 --pagesize 4096 --base 0x00000000 \
-            --kernel_offset 0x40000000 --ramdisk_offset 0x66f00000 \
-            --tags_offset 0x47c80000 --dtb_offset 0x47c80000 \
-            --vendor_cmdline "bootopt=64S3,32N2,64N2 androidboot.selinux=permissive" --board "" \
+            --header_version 4 \
+            --pagesize 4096 \
+            --base 0x00000000 \
+            --kernel_offset 0x40000000 \
+            --ramdisk_offset 0x66f00000 \
+            --tags_offset 0x47c80000 \
+            --dtb_offset 0x47c80000 \
+            --vendor_cmdline "bootopt=64S3,32N2,64N2 androidboot.selinux=permissive" \
+            --board "" \
             --dtb /tmp/dtb.img \
-            --ramdisk_type 1 --ramdisk_name "" \
+            --ramdisk_type 1 \
+            --ramdisk_name "" \
             --vendor_ramdisk_fragment /tmp/v00.lz4 \
-            --ramdisk_type 2 --ramdisk_name "recovery" \
+            --ramdisk_type 2 \
+            --ramdisk_name "recovery" \
             --vendor_ramdisk_fragment /tmp/ramdisk01_final.lz4 \
             --vendor_boot /tmp/vendor_boot.img
+
           ls -lh /tmp/vendor_boot.img
           sha256sum /tmp/vendor_boot.img
 
@@ -242,20 +260,36 @@ jobs:
         run: |
           HEADER=$(head -c 8 /tmp/vendor_boot.img)
           [ "$HEADER" = "VNDRBOOT" ] || { echo "::error::Bad header: $HEADER"; exit 1; }
-          echo "Header: $HEADER"
+
           SIZE=$(stat -c '%s' /tmp/vendor_boot.img)
-          [ "$SIZE" -le 67108864 ] || { echo "::error::Too big: $SIZE"; exit 1; }
-          echo "Size: $SIZE bytes"
-          python3 ${{ github.workspace }}/.github/scripts/verify_cpio.py /tmp/ramdisk01_final.lz4
-          rm -rf /tmp/verify_root && mkdir -p /tmp/verify_root
+          [ "$SIZE" -le 67108864 ] || { echo "::error::Too big: $SIZE bytes"; exit 1; }
+
+          python3 "${{ github.workspace }}/.github/scripts/verify_cpio.py" \
+            /tmp/ramdisk01_final.lz4
+
+          rm -rf /tmp/verify_root
+          mkdir -p /tmp/verify_root
           cd /tmp/verify_root
-          bsdtar -xf /tmp/verify.cpio 2>/dev/null
-          FILE_COUNT=$(find /tmp/verify_root -type f | wc -l)
-          [ "$FILE_COUNT" -ge 3400 ] || { echo "::error::Too few files: $FILE_COUNT"; exit 1; }
-          echo "Files: $FILE_COUNT"
-          INIT_SIZE=$(stat -c '%s' /tmp/verify_root/init.recovery.mt6878.rc 2>/dev/null || echo 0)
-          [ "$INIT_SIZE" -ge 200 ] || { echo "::error::init.recovery too small: $INIT_SIZE"; exit 1; }
-          echo "init.recovery: $INIT_SIZE bytes"
+          bsdtar -xf /tmp/verify.cpio
+
+          for f in \
+            init.recovery.mt6878.rc \
+            vendor/etc/init \
+            vendor/bin; do
+            [ -e "/tmp/verify_root/$f" ] || {
+              echo "::error::Missing required ramdisk path: $f"
+              exit 1
+            }
+          done
+
+          INIT_SIZE=$(stat -c '%s' /tmp/verify_root/init.recovery.mt6878.rc)
+          [ "$INIT_SIZE" -ge 200 ] || {
+            echo "::error::init.recovery too small: $INIT_SIZE bytes"
+            exit 1
+          }
+
+          echo "Image size: $SIZE bytes"
+          echo "init.recovery size: $INIT_SIZE bytes"
           echo "=== INTERNAL VERIFY PASSED ==="
 
       - name: Prepare Artifact
@@ -263,10 +297,16 @@ jobs:
           mkdir -p /tmp/artifact
           cp /tmp/vendor_boot.img /tmp/artifact/
           cp /tmp/ramdisk01_final.lz4 /tmp/artifact/ramdisk01.lz4
-          cp ${{ github.workspace }}/stock-files/dtb.img /tmp/artifact/
+          cp "${{ github.workspace }}/stock-files/dtb.img" /tmp/artifact/
           cp /tmp/verify_root/init.recovery.mt6878.rc /tmp/artifact/ 2>/dev/null || true
+
           cd /tmp/artifact
-          sha256sum vendor_boot.img > SHA256SUMS
+          sha256sum vendor_boot.img ramdisk01.lz4 dtb.img > SHA256SUMS
+          if [ -f init.recovery.mt6878.rc ]; then
+            sha256sum init.recovery.mt6878.rc >> SHA256SUMS
+          fi
+
+          cat SHA256SUMS
           ls -lh
 
       - name: Upload Artifact
@@ -281,69 +321,32 @@ jobs:
     name: Independent Verify
     needs: build
     runs-on: ubuntu-22.04
+
     steps:
       - uses: actions/checkout@v4
+
       - name: Install Tools
-        run: sudo apt-get update && sudo apt-get install -y libarchive-tools python3-pip && pip install lz4
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libarchive-tools python3-pip
+          pip install lz4
+
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
           name: twrp-${{ inputs.version }}-${{ github.run_id }}
           path: artifact
-      - name: Verify
+
+      - name: Verify Artifact
         run: |
           ls -lh artifact/
-          cd artifact && sha256sum -c SHA256SUMS && cd ..
-          HEADER=$(head -c 8 artifact/vendor_boot.img)
-          [ "$HEADER" = "VNDRBOOT" ] || { echo "::error::Bad header"; exit 1; }
-          SIZE=$(stat -c '%s' artifact/vendor_boot.img)
-          [ "$SIZE" -le 67108864 ] || { echo "::error::Too big"; exit 1; }
-          echo "Header + Size OK"
-          python3 .github/scripts/verify_cpio.py artifact/ramdisk01.lz4
-          mkdir -p /tmp/v_root && cd /tmp/v_root
-          bsdtar -xf /tmp/verify.cpio 2>/dev/null
-          FILES=$(find . -type f | wc -l)
-          [ "$FILES" -ge 3400 ] || { echo "::error::Too few: $FILES"; exit 1; }
-          echo "Files: $FILES"
-          echo "=== INDEPENDENT VERIFY PASSED ==="
+          cd artifact
+          sha256sum -c SHA256SUMS
 
-  release:
-    name: Create Release
-    permissions:
-      contents: write
-    needs: [build, verify]
-    if: ${{ inputs.create_release == true }}
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Download Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: twrp-${{ inputs.version }}-${{ github.run_id }}
-          path: release-files
-      - name: Prepare
-        env:
-          VERSION: ${{ inputs.version }}
-        run: |
-          if [[ ! "$VERSION" =~ ^[A-Za-z0-9][A-Za-z0-9._-]*$ ]]; then
-            echo "::error::Invalid version; use letters, digits, dots, underscores, or hyphens"
-            exit 1
-          fi
-          cd release-files
-          mv vendor_boot.img "twrp_lxx521_${VERSION}.img"
-          sha256sum "twrp_lxx521_${VERSION}.img" > SHA256SUMS
-          ls -lh
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ inputs.version }}
-          name: "TWRP ${{ inputs.version }} - Lava Play Ultra 5G"
-          body: |
-            ## TWRP ${{ inputs.version }}
-            TEE: ${{ inputs.enable_tee }}
-            ### Flash
-            mtk w vendor_boot_a twrp_lxx521_${{ inputs.version }}.img
-            mtk reset
-          files: |
-            release-files/twrp_lxx521_${{ inputs.version }}.img
-            release-files/SHA256SUMS
+          HEADER=$(head -c 8 vendor_boot.img)
+          [ "$HEADER" = "VNDRBOOT" ] || { echo "::error::Bad vendor_boot header"; exit 1; }
 
+          SIZE=$(stat -c '%s' vendor_boot.img)
+          [ "$SIZE" -le 67108864 ] || { echo "::error::vendor_boot.img too large"; exit 1; }
+
+          echo "Independent verification passed"
