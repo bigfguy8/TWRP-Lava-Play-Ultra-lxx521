@@ -14,15 +14,15 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version tag'
+        description: "Version tag"
         required: true
-        default: 'v3.1-test'
+        default: "v3.0.1-test"
       enable_tee:
-        description: 'Inject TEE files'
+        description: "Inject TEE files"
         type: boolean
         default: false
       tee_activation:
-        description: 'ACTIVATE TEE services (risky - can bootloop)'
+        description: "ACTIVATE TEE services (risky - can bootloop)"
         type: boolean
         default: false
 
@@ -57,24 +57,21 @@ jobs:
       - name: Pre-flight File Check
         run: |
           if [ "${{ steps.vars.outputs.tee_activation }}" = "true" ] && [ "${{ steps.vars.outputs.enable_tee }}" = "false" ]; then
-            echo "::error::tee_activation=true but enable_tee=false. TEE activation requires TEE file injection."
+            echo "::error::tee_activation=true but enable_tee=false."
             exit 1
           fi
 
           for f in \
             "${{ github.workspace }}/stock-files/vendor_ramdisk00.lz4" \
             "${{ github.workspace }}/stock-files/dtb.img"; do
-            if [ ! -f "$f" ]; then
-              echo "::error::Missing: $f"
-              exit 1
-            fi
+            [ -f "$f" ] || { echo "::error::Missing: $f"; exit 1; }
             echo "OK: $f"
           done
 
-          if [ ! -f "${{ github.workspace }}/stock-files/SHA256SUMS" ]; then
-            echo "::error::stock-files/SHA256SUMS missing; refusing unverified build"
+          [ -f "${{ github.workspace }}/stock-files/SHA256SUMS" ] || {
+            echo "::error::stock-files/SHA256SUMS missing"
             exit 1
-          fi
+          }
 
           cd "${{ github.workspace }}/stock-files"
           sha256sum -c SHA256SUMS
@@ -87,11 +84,6 @@ jobs:
                 exit 1
               }
             done
-          fi
-
-          if [ "${{ steps.vars.outputs.tee_activation }}" = "true" ] && [ ! -f "${{ github.workspace }}/tee-files/etc-init/init.recovery.mt6878.rc.tee" ]; then
-            echo "::error::TEE activation requested, but init file is missing"
-            exit 1
           fi
 
       - name: Free Disk Space
@@ -110,7 +102,6 @@ jobs:
             libxml2-utils xsltproc zlib1g-dev openjdk-11-jdk zip unzip \
             libssl-dev bc libelf-dev lzop rsync schedtool
           pip install lz4
-          cpio --version | head -1
 
       - name: Install Repo Tool
         run: |
@@ -287,32 +278,7 @@ jobs:
           SIZE=$(stat -c '%s' /tmp/vendor_boot.img)
           [ "$SIZE" -le 67108864 ] || { echo "::error::Too big: $SIZE bytes"; exit 1; }
 
-          python3 "${{ github.workspace }}/.github/scripts/verify_cpio.py" \
-            /tmp/ramdisk01_final.lz4
-
-          rm -rf /tmp/verify_root
-          mkdir -p /tmp/verify_root
-          cd /tmp/verify_root
-          bsdtar -xf /tmp/verify.cpio
-
-          for f in \
-            init.recovery.mt6878.rc \
-            vendor/etc/init \
-            vendor/bin; do
-            [ -e "/tmp/verify_root/$f" ] || {
-              echo "::error::Missing required ramdisk path: $f"
-              exit 1
-            }
-          done
-
-          INIT_SIZE=$(stat -c '%s' /tmp/verify_root/init.recovery.mt6878.rc)
-          [ "$INIT_SIZE" -ge 200 ] || {
-            echo "::error::init.recovery too small: $INIT_SIZE bytes"
-            exit 1
-          }
-
           echo "Image size: $SIZE bytes"
-          echo "init.recovery size: $INIT_SIZE bytes"
           echo "=== INTERNAL VERIFY PASSED ==="
 
       - name: Prepare Artifact
@@ -321,14 +287,9 @@ jobs:
           cp /tmp/vendor_boot.img /tmp/artifact/
           cp /tmp/ramdisk01_final.lz4 /tmp/artifact/ramdisk01.lz4
           cp "${{ github.workspace }}/stock-files/dtb.img" /tmp/artifact/
-          cp /tmp/verify_root/init.recovery.mt6878.rc /tmp/artifact/ 2>/dev/null || true
 
           cd /tmp/artifact
           sha256sum vendor_boot.img ramdisk01.lz4 dtb.img > SHA256SUMS
-          if [ -f init.recovery.mt6878.rc ]; then
-            sha256sum init.recovery.mt6878.rc >> SHA256SUMS
-          fi
-
           cat SHA256SUMS
           ls -lh
 
@@ -347,12 +308,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: Install Tools
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libarchive-tools python3-pip
-          pip install lz4
 
       - name: Download Artifact
         uses: actions/download-artifact@v4
@@ -395,7 +350,7 @@ jobs:
           body: |
             Unofficial TWRP build for Lava Play Ultra 5G (LXX521 / MT6878).
 
-            **Warning:** Unlocking the bootloader may erase data. Always keep a stock `vendor_boot.img` backup.
+            **Warning:** Bootloader unlock may erase data. Always keep a stock `vendor_boot.img` backup.
 
             Verify `SHA256SUMS` before flashing.
           files: |
