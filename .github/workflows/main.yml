@@ -1,8 +1,3 @@
-Here's a corrected GitHub Actions workflow with the gating bug fixed and a couple of small correctness improvements. The main fix is ensuring the Inject TEE step uses proper GitHub Actions expressions for the conditional.
-
-Note: This workflow is intended for GitHub Actions. It cannot be run directly in Termux. If you want to run a build locally on Termux, you’d need to convert it into a shell script with all dependencies installed locally, which is a separate effort.
-
-YAML (all-in-one, with bug fix):
 name: Build TWRP (Verify-First)
 
 on:
