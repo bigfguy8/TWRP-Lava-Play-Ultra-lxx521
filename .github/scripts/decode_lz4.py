@@ -27,4 +27,3 @@ while pos < len(data):
 with open(outfile, 'wb') as f:
     f.write(output)
 print(f"Decoded: {len(output):,} bytes -> {outfile}")
-

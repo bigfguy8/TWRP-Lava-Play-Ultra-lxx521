@@ -26,4 +26,3 @@ while pos < len(data):
 with open('/tmp/verify.cpio', 'wb') as f:
     f.write(output)
 print(f"Decoded: {len(output):,} bytes")
-

@@ -27,4 +27,3 @@ for i in range(0, len(data), BLOCK):
 with open(outfile, 'wb') as f:
     f.write(output)
 print(f"LZ4: {len(output):,} bytes ({len(output)/1024/1024:.2f} MB)")
-
