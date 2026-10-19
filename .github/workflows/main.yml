@@ -1,4 +1,5 @@
-# Force re-parse after fixing v* tag trigger`nname: Build TWRP (Verify-First)
+# Force re-parse after fixing v* tag trigger
+name: Build TWRP (Verify-First)
 
 on:
   push:
