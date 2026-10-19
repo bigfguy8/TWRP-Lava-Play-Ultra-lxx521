@@ -1,7 +1,6 @@
 name: Build TWRP (Verify-First)
 
-on:
-  workflow_dispatch:
+on:\n  push:\n    tags:\n      - "v*"\n  workflow_dispatch:
     inputs:
       version:
         description: 'Version tag'
@@ -37,7 +36,7 @@ jobs:
       - name: Pre-flight File Check
         run: |
           # v3.1 guard: tee_activation requires enable_tee
-          if [ "${{ inputs.tee_activation }}" = "true" ] && [ "${{ inputs.enable_tee }}" = "false" ]; then
+          if [ "$${{ steps.vars.outputs.tee_activation }}" = "true" ] && [ "$${{ steps.vars.outputs.enable_tee }}" = "false" ]; then
             echo "::error::tee_activation=true but enable_tee=false. TEE activation requires TEE file injection."
             exit 1
           fi
@@ -61,7 +60,7 @@ jobs:
             echo "WARNING: stock-files/SHA256SUMS not found. Building without checksum verification."
           fi
 
-          if [ "${{ inputs.enable_tee }}" = "true" ]; then
+          if [ "$${{ steps.vars.outputs.enable_tee }}" = "true" ]; then
             for d in bin bin-hw lib64 etc-init etc-vintf app-t6; do
               [ -d "${{ github.workspace }}/tee-files/$d" ] || { echo "::error::Missing: tee-files/$d"; exit 1; }
             done
@@ -163,7 +162,7 @@ jobs:
           cp $TEE/bin-hw/* $RAMDISK/vendor/bin/hw/
           cp $TEE/lib64/*.so $RAMDISK/vendor/lib64/
           # Copy init scripts
-          if [ "${{ inputs.tee_activation }}" = "true" ]; then
+          if [ "$${{ steps.vars.outputs.tee_activation }}" = "true" ]; then
             echo "  TEE MODE: Skipping stock .rc copy (our init defines all)"
           else
             for rc_file in $TEE/etc-init/*.rc; do
@@ -174,7 +173,7 @@ jobs:
             done
           fi
           # VINTF manifests
-          if [ "${{ inputs.tee_activation }}" = "true" ]; then
+          if [ "$${{ steps.vars.outputs.tee_activation }}" = "true" ]; then
             echo "  TEE MODE: Skipping stock VINTF copy"
           else
             for xml_file in $TEE/etc-vintf/*.xml; do
@@ -196,7 +195,7 @@ jobs:
           echo "TEE files: $(find $RAMDISK/vendor -type f | wc -l)"
           
           # Swap init.recovery ONLY if tee_activation=true (DANGEROUS)
-          if [ "${{ inputs.tee_activation }}" = "true" ] && [ -f "$TEE/etc-init/init.recovery.mt6878.rc.tee" ]; then
+          if [ "$${{ steps.vars.outputs.tee_activation }}" = "true" ] && [ -f "$TEE/etc-init/init.recovery.mt6878.rc.tee" ]; then
             cp "$TEE/etc-init/init.recovery.mt6878.rc.tee" "$RAMDISK/init.recovery.mt6878.rc"
             echo "TEE ACTIVATION: init.recovery replaced with TEE version"
             echo "New init.recovery size: $(stat -c '%s' "$RAMDISK/init.recovery.mt6878.rc") bytes"
@@ -268,7 +267,7 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: twrp-${{ inputs.version }}-${{ github.run_id }}
+          name: twrp-$${{ steps.vars.outputs.version }}-${{ github.run_id }}
           path: /tmp/artifact/
           retention-days: 14
           if-no-files-found: error
@@ -284,7 +283,7 @@ jobs:
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
-          name: twrp-${{ inputs.version }}-${{ github.run_id }}
+          name: twrp-$${{ steps.vars.outputs.version }}-${{ github.run_id }}
           path: artifact
       - name: Verify
         run: |
@@ -312,25 +311,25 @@ jobs:
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
-          name: twrp-${{ inputs.version }}-${{ github.run_id }}
+          name: twrp-$${{ steps.vars.outputs.version }}-${{ github.run_id }}
           path: release-files
       - name: Prepare
         run: |
           cd release-files
-          mv vendor_boot.img twrp_lxx521_${{ inputs.version }}.img
-          sha256sum twrp_lxx521_${{ inputs.version }}.img > SHA256SUMS
+          mv vendor_boot.img twrp_lxx521_$${{ steps.vars.outputs.version }}.img
+          sha256sum twrp_lxx521_$${{ steps.vars.outputs.version }}.img > SHA256SUMS
           ls -lh
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ inputs.version }}
-          name: "TWRP ${{ inputs.version }} - Lava Play Ultra 5G"
+          tag_name: $${{ steps.vars.outputs.version }}
+          name: "TWRP $${{ steps.vars.outputs.version }} - Lava Play Ultra 5G"
           body: |
-            ## TWRP ${{ inputs.version }}
-            TEE: ${{ inputs.enable_tee }}
+            ## TWRP $${{ steps.vars.outputs.version }}
+            TEE: $${{ steps.vars.outputs.enable_tee }}
             ### Flash
-            mtk w vendor_boot_a twrp_lxx521_${{ inputs.version }}.img
+            mtk w vendor_boot_a twrp_lxx521_$${{ steps.vars.outputs.version }}.img
             mtk reset
           files: |
-            release-files/twrp_lxx521_${{ inputs.version }}.img
+            release-files/twrp_lxx521_$${{ steps.vars.outputs.version }}.img
             release-files/SHA256SUMS
