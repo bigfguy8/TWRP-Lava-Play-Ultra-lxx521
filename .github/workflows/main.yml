@@ -24,8 +24,7 @@ permissions:
 
 jobs:
   build:
-    name: Build TWRP
-    runs-on: ubuntu-22.04
+    name: Build TWRP\n    runs-on: ubuntu-22.04\n    outputs:\n      create_release: ${{ steps.vars.outputs.create_release }}
     timeout-minutes: 330
     steps:
       - name: Checkout Repository
@@ -139,7 +138,7 @@ jobs:
           echo "Files: $(find /tmp/ramdisk_root -type f | wc -l)"
 
       - name: Inject TEE
-        if: inputs.enable_tee == true
+        if: steps.vars.outputs.enable_tee == true
         run: |
           set -e
           RAMDISK=/tmp/ramdisk_root
@@ -305,7 +304,7 @@ jobs:
   release:
     name: Create Release
     needs: [build, verify]
-    if: ${{ inputs.create_release == true }}
+    if: ${{ needs.build.outputs.create_release == 'true' }}
     runs-on: ubuntu-22.04
     steps:
       - name: Download Artifact
