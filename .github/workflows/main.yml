@@ -1,6 +1,10 @@
 name: Build TWRP (Verify-First)
 
-on:\n  push:\n    tags:\n      - "v*"\n  workflow_dispatch:
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
     inputs:
       version:
         description: 'Version tag'
