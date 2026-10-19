@@ -334,6 +334,6 @@ jobs:
             ### Flash
             mtk w vendor_boot_a twrp_lxx521_${{ inputs.version }}.img
             mtk reset
-        files: |
-          release-files/twrp_lxx521_${{ inputs.version }}.img
-          release-files/SHA256SUMS
+          files: |
+            release-files/twrp_lxx521_${{ inputs.version }}.img
+            release-files/SHA256SUMS
