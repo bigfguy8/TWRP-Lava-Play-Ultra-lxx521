@@ -29,7 +29,10 @@ permissions:
 
 jobs:
   build:
-    name: Build TWRP\n    runs-on: ubuntu-22.04\n    outputs:\n      create_release: ${{ steps.vars.outputs.create_release }}
+    name: Build TWRP
+    runs-on: ubuntu-22.04
+    outputs:
+      create_release: ${{ steps.vars.outputs.create_release }}
     timeout-minutes: 330
     steps:
       - name: Checkout Repository
