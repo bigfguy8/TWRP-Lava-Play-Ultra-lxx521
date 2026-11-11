@@ -161,8 +161,8 @@ jobs:
           mkdir -p device/lava/lxx521/prebuilt/modules
           cp -r device/lava/lxx521-kernel/modules/* device/lava/lxx521/prebuilt/modules/
           cp device/lava/lxx521-kernel/images/* device/lava/lxx521/prebuilt/ 2>/dev/null || true
-          # Add TWRP lunch combo (vendorsetup.sh is for OrangeFox, doesn't add TWRP combo)
-          echo 'add_lunch_combo twrp_lxx521-eng' >> device/lava/lxx521/vendorsetup.sh
+          # Note: AndroidProducts.mk already has COMMON_LUNCH_CHOICES := twrp_lxx521-eng
+          # add_lunch_combo is obsolete in modern build system
           echo "Device tree and kernel prebuilts ready"
 
       - name: Build TWRP
