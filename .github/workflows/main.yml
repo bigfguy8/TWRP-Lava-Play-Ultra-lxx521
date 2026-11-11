@@ -47,12 +47,16 @@ env:
 
 jobs:
   build:
-    name: Build TWRP (${{ inputs.twrp_branch }})
+    name: Build TWRP
     runs-on: ubuntu-22.04
     timeout-minutes: 360
+    env:
+      # Determine TWRP branch: use input if workflow_dispatch, else default to twrp-14.1
+      TWRP_BRANCH: ${{ github.event.inputs.twrp_branch || 'twrp-14.1' }}
     outputs:
       artifact_name: ${{ steps.prepare_artifact.outputs.artifact_name }}
       sha256: ${{ steps.prepare_artifact.outputs.sha256 }}
+      twrp_branch: ${{ env.TWRP_BRANCH }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -60,9 +64,12 @@ jobs:
           fetch-depth: 1
 
       - name: Pre-flight File Check
+        env:
+          ENABLE_TEE: ${{ github.event.inputs.enable_tee || 'true' }}
+          TEE_ACTIVATION: ${{ github.event.inputs.tee_activation || 'false' }}
         run: |
           # Guard: tee_activation requires enable_tee
-          if [ "${{ inputs.tee_activation }}" = "true" ] && [ "${{ inputs.enable_tee }}" = "false" ]; then
+          if [ "$TEE_ACTIVATION" = "true" ] && [ "$ENABLE_TEE" = "false" ]; then
             echo "::error::tee_activation=true but enable_tee=false. TEE activation requires TEE file injection."
             exit 1
           fi
@@ -86,12 +93,12 @@ jobs:
             echo "::warning::stock-files/SHA256SUMS not found. Building without checksum verification."
           fi
 
-          if [ "${{ inputs.enable_tee }}" = "true" ]; then
+          if [ "$ENABLE_TEE" = "true" ]; then
             for d in bin bin-hw lib64 etc-init etc-vintf app-t6; do
               [ -d "${{ github.workspace }}/tee-files/$d" ] || { echo "::error::Missing: tee-files/$d"; exit 1; }
             done
             # Check for TEE activation init script
-            if [ "${{ inputs.tee_activation }}" = "true" ]; then
+            if [ "$TEE_ACTIVATION" = "true" ]; then
               [ -f "${{ github.workspace }}/tee-files/etc-init/init.recovery.mt6878.rc.tee" ] || \
                 { echo "::error::TEE activation requested but tee-files/etc-init/init.recovery.mt6878.rc.tee not found"; exit 1; }
             fi
@@ -107,9 +114,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /tmp/ccache
-          key: ccache-${{ inputs.twrp_branch }}-${{ github.run_id }}
+          key: ccache-${{ env.TWRP_BRANCH }}-${{ github.run_id }}
           restore-keys: |
-            ccache-${{ inputs.twrp_branch }}-
+            ccache-${{ env.TWRP_BRANCH }}-
             ccache-
 
       - name: Install Dependencies
@@ -139,7 +146,8 @@ jobs:
           cd workspace
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
-          repo init -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b ${{ inputs.twrp_branch }} --depth=1
+          echo "Using TWRP branch: $TWRP_BRANCH"
+          repo init -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b "$TWRP_BRANCH" --depth=1
           repo sync -c -j$(nproc) --force-sync --no-clone-bundle --no-tags --optimized-fetch --prune
 
       - name: Clone Device Tree & Kernel
@@ -198,7 +206,9 @@ jobs:
           echo "Files extracted: $(find /tmp/ramdisk_root -type f | wc -l)"
 
       - name: Inject TEE Files
-        if: inputs.enable_tee == true
+        if: github.event.inputs.enable_tee != 'false'
+        env:
+          TEE_ACTIVATION: ${{ github.event.inputs.tee_activation || 'false' }}
         run: |
           set -e
           RAMDISK=/tmp/ramdisk_root
@@ -225,7 +235,7 @@ jobs:
           cp $TEE/lib64/*.so $RAMDISK/vendor/lib64/
           
           # Copy init scripts
-          if [ "${{ inputs.tee_activation }}" = "true" ]; then
+          if [ "$TEE_ACTIVATION" = "true" ]; then
             echo "  TEE ACTIVATION MODE: Using custom init.recovery (stock .rc files NOT copied)"
           else
             for rc_file in $TEE/etc-init/*.rc; do
@@ -237,7 +247,7 @@ jobs:
           fi
           
           # VINTF manifests
-          if [ "${{ inputs.tee_activation }}" = "true" ]; then
+          if [ "$TEE_ACTIVATION" = "true" ]; then
             echo "  TEE ACTIVATION MODE: Skipping stock VINTF copy"
           else
             for xml_file in $TEE/etc-vintf/*.xml; do
@@ -263,7 +273,7 @@ jobs:
           echo "TEE files injected: $(find $RAMDISK/vendor -type f | wc -l)"
           
           # Swap init.recovery ONLY if tee_activation=true (DANGEROUS)
-          if [ "${{ inputs.tee_activation }}" = "true" ] && [ -f "$TEE/etc-init/init.recovery.mt6878.rc.tee" ]; then
+          if [ "$TEE_ACTIVATION" = "true" ] && [ -f "$TEE/etc-init/init.recovery.mt6878.rc.tee" ]; then
             cp "$TEE/etc-init/init.recovery.mt6878.rc.tee" "$RAMDISK/init.recovery.mt6878.rc"
             echo "TEE ACTIVATION: init.recovery replaced with TEE version"
             echo "New init.recovery size: $(stat -c '%s' "$RAMDISK/init.recovery.mt6878.rc") bytes"
@@ -303,6 +313,8 @@ jobs:
           cat /tmp/vendor_boot.sha256
 
       - name: Internal Verify
+        env:
+          ENABLE_TEE: ${{ github.event.inputs.enable_tee || 'true' }}
         run: |
           HEADER=$(head -c 8 /tmp/vendor_boot.img)
           [ "$HEADER" = "VNDRBOOT" ] || { echo "::error::Bad header: $HEADER"; exit 1; }
@@ -321,7 +333,7 @@ jobs:
           [ "$INIT_SIZE" -ge 200 ] || { echo "::error::init.recovery too small: $INIT_SIZE bytes"; exit 1; }
           echo "init.recovery size: $INIT_SIZE bytes"
           # Verify TEE files if enabled
-          if [ "${{ inputs.enable_tee }}" = "true" ]; then
+          if [ "$ENABLE_TEE" = "true" ]; then
             TEE_BINS=$(find /tmp/verify_root/vendor/bin -name "teed" -o -name "tee_check_keybox" | wc -l)
             TEE_LIBS=$(find /tmp/verify_root/vendor/lib64 -name "*.so" | wc -l)
             TEE_TAS=$(find /tmp/verify_root/vendor/app/t6 -name "*.ta" | wc -l)
@@ -343,7 +355,7 @@ jobs:
           sha256sum vendor_boot.img > SHA256SUMS
           SHA256=$(cat SHA256SUMS | cut -d' ' -f1)
           echo "sha256=$SHA256" >> $GITHUB_OUTPUT
-          ARTIFACT_NAME="twrp-${{ inputs.version }}-${{ inputs.twrp_branch }}-${{ github.run_id }}"
+          ARTIFACT_NAME="twrp-${{ inputs.version }}-${{ env.TWRP_BRANCH }}-${{ github.run_id }}"
           echo "artifact_name=$ARTIFACT_NAME" >> $GITHUB_OUTPUT
           ls -lh
 
@@ -357,7 +369,7 @@ jobs:
 
   verify:
     name: Independent Verify
-    if: ${{ !inputs.skip_verify }}
+    if: ${{ !github.event.inputs.skip_verify }}
     needs: build
     runs-on: ubuntu-22.04
     steps:
@@ -387,7 +399,7 @@ jobs:
           [ "$FILES" -ge 3400 ] || { echo "::error::Too few: $FILES"; exit 1; }
           echo "Files: $FILES"
           # Verify TEE files if enabled
-          if [ "${{ needs.build.outputs.artifact_name }}" = *"tee"* ] || [ "${{ github.event.inputs.enable_tee }}" = "true" ]; then
+          if [ "${{ needs.build.outputs.artifact_name }}" = *"tee"* ] || [ "${{ github.event.inputs.enable_tee }}" = "true" ] || [ "${{ needs.build.outputs.twrp_branch }}" != "" ]; then
             TEE_BINS=$(find . -path "*/vendor/bin/teed" -o -path "*/vendor/bin/tee_check_keybox" | wc -l)
             TEE_TAS=$(find . -path "*/vendor/app/t6/*.ta" | wc -l)
             echo "Independent verify: TEE binaries=$TEE_BINS, trusted apps=$TEE_TAS"
@@ -397,7 +409,7 @@ jobs:
   release:
     name: Create Release
     needs: [build, verify]
-    if: ${{ inputs.create_release == true && !inputs.skip_verify }}
+    if: ${{ github.event.inputs.create_release == true && github.event.inputs.skip_verify != true }}
     runs-on: ubuntu-22.04
     steps:
       - name: Download Artifact
@@ -415,14 +427,14 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ inputs.version }}
-          name: "TWRP ${{ inputs.version }} - Lava Play Ultra 5G (${{ inputs.twrp_branch }})"
+          name: "TWRP ${{ inputs.version }} - Lava Play Ultra 5G (${{ needs.build.outputs.twrp_branch }})"
           body: |
             ## TWRP ${{ inputs.version }} for Lava Play Ultra 5G (LXX521)
             
             **Build Configuration:**
-            - TWRP Base: ${{ inputs.twrp_branch }}
-            - TEE Injection: ${{ inputs.enable_tee }}
-            - TEE Activation: ${{ inputs.tee_activation }}
+            - TWRP Base: ${{ needs.build.outputs.twrp_branch }}
+            - TEE Injection: ${{ github.event.inputs.enable_tee || 'true' }}
+            - TEE Activation: ${{ github.event.inputs.tee_activation || 'false' }}
             
             **Flashing Instructions:**
             ```bash
@@ -441,7 +453,7 @@ jobs:
             - Flashing a wrong image can bootloop or brick the device.
             - Always keep your stock `vendor_boot.img` backup.
             - Do not flash `preloader`, `nvram`, `nvdata`, `modem`, or `persist`.
-            ${{ inputs.tee_activation == 'true' && '⚠️ TEE ACTIVATION ENABLED - This replaces init.recovery and may cause bootloops if incompatible!' || '' }}
+            ${{ github.event.inputs.tee_activation == 'true' && '⚠️ TEE ACTIVATION ENABLED - This replaces init.recovery and may cause bootloops if incompatible!' || '' }}
           files: |
             release-files/twrp_lxx521_${{ inputs.version }}.img
             release-files/SHA256SUMS
