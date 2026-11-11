@@ -155,14 +155,14 @@ jobs:
         run: |
           # Clone device tree (updated to latest)
           git clone --depth=1 https://github.com/fahimfrk/Dimensity7300-Device-Tree-Lava-Play-Ultra device/lava/lxx521
+          # Remove obsolete add_lunch_combo from upstream vendorsetup.sh (use COMMON_LUNCH_CHOICES instead)
+          sed -i '/add_lunch_combo/d' device/lava/lxx521/vendorsetup.sh
           # Clone kernel prebuilts
           git clone --depth=1 --branch lineage-23.2 https://github.com/SiliconxLab/android_device_lava_lxx521-kernel device/lava/lxx521-kernel
           # Link kernel prebuilts to device tree prebuilt location
           mkdir -p device/lava/lxx521/prebuilt/modules
           cp -r device/lava/lxx521-kernel/modules/* device/lava/lxx521/prebuilt/modules/
           cp device/lava/lxx521-kernel/images/* device/lava/lxx521/prebuilt/ 2>/dev/null || true
-          # Note: AndroidProducts.mk already has COMMON_LUNCH_CHOICES := twrp_lxx521-eng
-          # add_lunch_combo is obsolete in modern build system
           echo "Device tree and kernel prebuilts ready"
 
       - name: Build TWRP
