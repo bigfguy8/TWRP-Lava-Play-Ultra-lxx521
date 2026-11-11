@@ -41,7 +41,6 @@ permissions:
   contents: write
 
 env:
-  # Cache key for ccache
   CCACHE_DIR: /tmp/ccache
   CCACHE_MAXSIZE: 10G
 
@@ -51,12 +50,18 @@ jobs:
     runs-on: ubuntu-22.04
     timeout-minutes: 360
     env:
-      # Determine TWRP branch: use input if workflow_dispatch, else default to twrp-14.1
+      # Fallback logic for workflow_dispatch vs tag push
       TWRP_BRANCH: ${{ github.event.inputs.twrp_branch || 'twrp-14.1' }}
+      ENABLE_TEE: ${{ github.event.inputs.enable_tee || 'true' }}
+      TEE_ACTIVATION: ${{ github.event.inputs.tee_activation || 'false' }}
+      VERSION: ${{ github.event.inputs.version || github.ref_name }}
     outputs:
       artifact_name: ${{ steps.prepare_artifact.outputs.artifact_name }}
       sha256: ${{ steps.prepare_artifact.outputs.sha256 }}
       twrp_branch: ${{ env.TWRP_BRANCH }}
+      enable_tee: ${{ env.ENABLE_TEE }}
+      tee_activation: ${{ env.TEE_ACTIVATION }}
+      version: ${{ env.VERSION }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -64,12 +69,9 @@ jobs:
           fetch-depth: 1
 
       - name: Pre-flight File Check
-        env:
-          ENABLE_TEE: ${{ github.event.inputs.enable_tee || 'true' }}
-          TEE_ACTIVATION: ${{ github.event.inputs.tee_activation || 'false' }}
         run: |
           # Guard: tee_activation requires enable_tee
-          if [ "$TEE_ACTIVATION" = "true" ] && [ "$ENABLE_TEE" = "false" ]; then
+          if [ "${{ env.TEE_ACTIVATION }}" = "true" ] && [ "${{ env.ENABLE_TEE }}" = "false" ]; then
             echo "::error::tee_activation=true but enable_tee=false. TEE activation requires TEE file injection."
             exit 1
           fi
@@ -93,12 +95,11 @@ jobs:
             echo "::warning::stock-files/SHA256SUMS not found. Building without checksum verification."
           fi
 
-          if [ "$ENABLE_TEE" = "true" ]; then
+          if [ "${{ env.ENABLE_TEE }}" = "true" ]; then
             for d in bin bin-hw lib64 etc-init etc-vintf app-t6; do
               [ -d "${{ github.workspace }}/tee-files/$d" ] || { echo "::error::Missing: tee-files/$d"; exit 1; }
             done
-            # Check for TEE activation init script
-            if [ "$TEE_ACTIVATION" = "true" ]; then
+            if [ "${{ env.TEE_ACTIVATION }}" = "true" ]; then
               [ -f "${{ github.workspace }}/tee-files/etc-init/init.recovery.mt6878.rc.tee" ] || \
                 { echo "::error::TEE activation requested but tee-files/etc-init/init.recovery.mt6878.rc.tee not found"; exit 1; }
             fi
@@ -146,24 +147,20 @@ jobs:
           cd workspace
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
-          echo "Using TWRP branch: $TWRP_BRANCH"
-          repo init -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b "$TWRP_BRANCH" --depth=1
+          echo "Using TWRP branch: ${{ env.TWRP_BRANCH }}"
+          repo init -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b "${{ env.TWRP_BRANCH }}" --depth=1
           repo sync -c -j$(nproc) --force-sync --no-clone-bundle --no-tags --optimized-fetch --prune
 
       - name: Clone Device Tree & Kernel
         working-directory: workspace
         run: |
-          # Clone device tree (updated to latest)
           git clone --depth=1 https://github.com/fahimfrk/Dimensity7300-Device-Tree-Lava-Play-Ultra device/lava/lxx521
-          # Remove obsolete add_lunch_combo from upstream vendorsetup.sh (use COMMON_LUNCH_CHOICES instead)
           sed -i '/add_lunch_combo/d' device/lava/lxx521/vendorsetup.sh
           echo "=== vendorsetup.sh after sed ==="
           cat device/lava/lxx521/vendorsetup.sh
           echo "=== AndroidProducts.mk ==="
           cat device/lava/lxx521/AndroidProducts.mk
-          # Clone kernel prebuilts
           git clone --depth=1 --branch lineage-23.2 https://github.com/SiliconxLab/android_device_lava_lxx521-kernel device/lava/lxx521-kernel
-          # Link kernel prebuilts to device tree prebuilt location
           mkdir -p device/lava/lxx521/prebuilt/modules
           cp -r device/lava/lxx521-kernel/modules/* device/lava/lxx521/prebuilt/modules/
           cp device/lava/lxx521-kernel/images/* device/lava/lxx521/prebuilt/ 2>/dev/null || true
@@ -215,9 +212,7 @@ jobs:
           echo "Files extracted: $(find /tmp/ramdisk_root -type f | wc -l)"
 
       - name: Inject TEE Files
-        if: github.event.inputs.enable_tee != 'false'
-        env:
-          TEE_ACTIVATION: ${{ github.event.inputs.tee_activation || 'false' }}
+        if: env.ENABLE_TEE == 'true'
         run: |
           set -e
           RAMDISK=/tmp/ramdisk_root
@@ -227,70 +222,42 @@ jobs:
           mkdir -p $RAMDISK/vendor/etc/init $RAMDISK/vendor/etc/vintf/manifest
           mkdir -p $RAMDISK/vendor/app/t6
           
-          # Targeted cleanup: only remove STOCK TEE-related .rc files
-          rm -f $RAMDISK/vendor/etc/init/trustkernel.rc 2>/dev/null || true
-          rm -f $RAMDISK/vendor/etc/init/trustkernel.rc.disabled 2>/dev/null || true
-          rm -f $RAMDISK/vendor/etc/init/android.hardware.security.keymint@*.rc 2>/dev/null || true
-          rm -f $RAMDISK/vendor/etc/init/android.hardware.security.keymint@*.rc.disabled 2>/dev/null || true
-          rm -f $RAMDISK/vendor/etc/init/android.hardware.gatekeeper-service*.rc 2>/dev/null || true
-          rm -f $RAMDISK/vendor/etc/init/android.hardware.gatekeeper-service*.rc.disabled 2>/dev/null || true
+          # Targeted cleanup
+          rm -f $RAMDISK/vendor/etc/init/trustkernel.rc* 2>/dev/null || true
+          rm -f $RAMDISK/vendor/etc/init/android.hardware.security.keymint@*.rc* 2>/dev/null || true
+          rm -f $RAMDISK/vendor/etc/init/android.hardware.gatekeeper-service*.rc* 2>/dev/null || true
           rm -f $RAMDISK/vendor/etc/init/init.recovery.mt6878.rc.tee 2>/dev/null || true
-          echo "Targeted cleanup done (TWRP files preserved)"
           
-          # Copy TEE binaries
           cp $TEE/bin/teed $RAMDISK/vendor/bin/
           cp $TEE/bin/tee_check_keybox $RAMDISK/vendor/bin/
           cp $TEE/bin-hw/* $RAMDISK/vendor/bin/hw/
           cp $TEE/lib64/*.so $RAMDISK/vendor/lib64/
           
-          # Copy init scripts
-          if [ "$TEE_ACTIVATION" = "true" ]; then
-            echo "  TEE ACTIVATION MODE: Using custom init.recovery (stock .rc files NOT copied)"
+          if [ "${{ env.TEE_ACTIVATION }}" = "true" ]; then
+            echo "  TEE ACTIVATION MODE"
           else
-            # SAFE MODE WITH DECRYPTION: Copy .rc files WITHOUT .disabled so services can start
             for rc_file in $TEE/etc-init/*.rc; do
               [ -f "$rc_file" ] || continue
-              basename_rc=$(basename "$rc_file")
-              cp "$rc_file" "$RAMDISK/vendor/etc/init/${basename_rc}"
-              echo "  ENABLED: ${basename_rc} (for decryption)"
+              cp "$rc_file" "$RAMDISK/vendor/etc/init/$(basename "$rc_file")"
             done
-          fi
-          
-          # VINTF manifests
-          if [ "$TEE_ACTIVATION" = "true" ]; then
-            echo "  TEE ACTIVATION MODE: Skipping stock VINTF copy"
-          else
-            # SAFE MODE WITH DECRYPTION: Copy VINTF manifests WITHOUT .disabled
             for xml_file in $TEE/etc-vintf/*.xml; do
               [ -f "$xml_file" ] || continue
-              basename_xml=$(basename "$xml_file")
-              cp "$xml_file" "$RAMDISK/vendor/etc/vintf/manifest/${basename_xml}"
-              echo "  ENABLED: ${basename_xml} (for decryption)"
+              cp "$xml_file" "$RAMDISK/vendor/etc/vintf/manifest/$(basename "$xml_file")"
             done
           fi
           
-          # Copy TEE trusted applications
           cp $TEE/app-t6/*.ta $RAMDISK/vendor/app/t6/
           cp $TEE/app-t6/cfg.ini $RAMDISK/vendor/app/t6/
           cp -r $TEE/app-t6/data $RAMDISK/vendor/app/t6/
           
           chmod 755 $RAMDISK/vendor/bin/teed $RAMDISK/vendor/bin/tee_check_keybox
           chmod 755 $RAMDISK/vendor/bin/hw/*
-          
-          # Ensure data directory AND contents are readable
           find $RAMDISK/vendor/app/t6/data -type d -exec chmod 0755 {} \; 2>/dev/null || true
           find $RAMDISK/vendor/app/t6/data -type f -exec chmod 0644 {} \; 2>/dev/null || true
-          echo "TEE data permissions set"
-          echo "TEE files injected: $(find $RAMDISK/vendor -type f | wc -l)"
           
-          # Swap init.recovery ONLY if tee_activation=true (DANGEROUS)
-          if [ "$TEE_ACTIVATION" = "true" ] && [ -f "$TEE/etc-init/init.recovery.mt6878.rc.tee" ]; then
+          if [ "${{ env.TEE_ACTIVATION }}" = "true" ] && [ -f "$TEE/etc-init/init.recovery.mt6878.rc.tee" ]; then
             cp "$TEE/etc-init/init.recovery.mt6878.rc.tee" "$RAMDISK/init.recovery.mt6878.rc"
-            echo "TEE ACTIVATION: init.recovery replaced with TEE version"
-            echo "New init.recovery size: $(stat -c '%s' "$RAMDISK/init.recovery.mt6878.rc") bytes"
-          else
-            echo "SAFE MODE WITH DECRYPTION: Using standard init.recovery + TEE services enabled"
-            echo "TEE services (keymint, gatekeeper) will start via vendor init.rc"
+            echo "TEE ACTIVATION: init.recovery replaced"
           fi
 
       - name: Repack CPIO
@@ -299,9 +266,7 @@ jobs:
           find . | cpio -o -H newc --owner=0:0 > /tmp/ramdisk01_new.cpio 2>/dev/null
           MAGIC=$(head -c 6 /tmp/ramdisk01_new.cpio)
           [ "$MAGIC" = "070701" ] || { echo "::error::Bad CPIO magic: $MAGIC"; exit 1; }
-          echo "CPIO size: $(stat -c '%s' /tmp/ramdisk01_new.cpio) bytes"
           python3 ${{ github.workspace }}/.github/scripts/encode_lz4.py /tmp/ramdisk01_new.cpio /tmp/ramdisk01_final.lz4
-          echo "Final LZ4 size: $(stat -c '%s' /tmp/ramdisk01_final.lz4) bytes"
 
       - name: Build vendor_boot.img
         working-directory: workspace
@@ -319,38 +284,27 @@ jobs:
             --ramdisk_type 2 --ramdisk_name "recovery" \
             --vendor_ramdisk_fragment /tmp/ramdisk01_final.lz4 \
             --vendor_boot /tmp/vendor_boot.img
-          ls -lh /tmp/vendor_boot.img
           sha256sum /tmp/vendor_boot.img > /tmp/vendor_boot.sha256
-          cat /tmp/vendor_boot.sha256
 
       - name: Internal Verify
-        env:
-          ENABLE_TEE: ${{ github.event.inputs.enable_tee || 'true' }}
         run: |
           HEADER=$(head -c 8 /tmp/vendor_boot.img)
           [ "$HEADER" = "VNDRBOOT" ] || { echo "::error::Bad header: $HEADER"; exit 1; }
-          echo "Header: $HEADER"
           SIZE=$(stat -c '%s' /tmp/vendor_boot.img)
           [ "$SIZE" -le 67108864 ] || { echo "::error::Too big: $SIZE bytes (max 64MB)"; exit 1; }
-          echo "Size: $SIZE bytes"
           python3 ${{ github.workspace }}/.github/scripts/verify_cpio.py /tmp/ramdisk01_final.lz4
+          
           rm -rf /tmp/verify_root && mkdir -p /tmp/verify_root
           cd /tmp/verify_root
           bsdtar -xf /tmp/verify.cpio 2>/dev/null
           FILE_COUNT=$(find /tmp/verify_root -type f | wc -l)
-          [ "$FILE_COUNT" -ge 3400 ] || { echo "::error::Too few files: $FILE_COUNT (expected >= 3400)"; exit 1; }
-          echo "Files in ramdisk: $FILE_COUNT"
+          [ "$FILE_COUNT" -ge 3400 ] || { echo "::error::Too few files: $FILE_COUNT"; exit 1; }
           INIT_SIZE=$(stat -c '%s' /tmp/verify_root/init.recovery.mt6878.rc 2>/dev/null || echo 0)
-          [ "$INIT_SIZE" -ge 200 ] || { echo "::error::init.recovery too small: $INIT_SIZE bytes"; exit 1; }
-          echo "init.recovery size: $INIT_SIZE bytes"
-          # Verify TEE files if enabled
-          if [ "$ENABLE_TEE" = "true" ]; then
+          [ "$INIT_SIZE" -ge 200 ] || { echo "::error::init.recovery too small"; exit 1; }
+          
+          if [ "${{ env.ENABLE_TEE }}" = "true" ]; then
             TEE_BINS=$(find /tmp/verify_root/vendor/bin -name "teed" -o -name "tee_check_keybox" | wc -l)
-            TEE_LIBS=$(find /tmp/verify_root/vendor/lib64 -name "*.so" | wc -l)
-            TEE_TAS=$(find /tmp/verify_root/vendor/app/t6 -name "*.ta" | wc -l)
-            echo "TEE binaries: $TEE_BINS, libraries: $TEE_LIBS, trusted apps: $TEE_TAS"
             [ "$TEE_BINS" -ge 2 ] || { echo "::error::TEE binaries missing"; exit 1; }
-            [ "$TEE_TAS" -ge 4 ] || { echo "::error::TEE trusted apps missing"; exit 1; }
           fi
           echo "=== INTERNAL VERIFY PASSED ==="
 
@@ -366,7 +320,7 @@ jobs:
           sha256sum vendor_boot.img > SHA256SUMS
           SHA256=$(cat SHA256SUMS | cut -d' ' -f1)
           echo "sha256=$SHA256" >> $GITHUB_OUTPUT
-          ARTIFACT_NAME="twrp-${{ inputs.version }}-${{ env.TWRP_BRANCH }}-${{ github.run_id }}"
+          ARTIFACT_NAME="twrp-${{ env.VERSION }}-${{ env.TWRP_BRANCH }}-${{ github.run_id }}"
           echo "artifact_name=$ARTIFACT_NAME" >> $GITHUB_OUTPUT
           ls -lh
 
@@ -380,7 +334,7 @@ jobs:
 
   verify:
     name: Independent Verify
-    if: ${{ !github.event.inputs.skip_verify }}
+    if: ${{ !github.event.inputs.skip_verify || github.event_name == 'push' }}
     needs: build
     runs-on: ubuntu-22.04
     steps:
@@ -402,25 +356,28 @@ jobs:
           [ "$HEADER" = "VNDRBOOT" ] || { echo "::error::Bad header"; exit 1; }
           SIZE=$(stat -c '%s' artifact/vendor_boot.img)
           [ "$SIZE" -le 67108864 ] || { echo "::error::Too big"; exit 1; }
-          echo "Header + Size OK"
           python3 .github/scripts/verify_cpio.py artifact/ramdisk01.lz4
+          
           mkdir -p /tmp/v_root && cd /tmp/v_root
           bsdtar -xf /tmp/verify.cpio 2>/dev/null
           FILES=$(find . -type f | wc -l)
           [ "$FILES" -ge 3400 ] || { echo "::error::Too few: $FILES"; exit 1; }
           echo "Files: $FILES"
-          # Verify TEE files if enabled
-          if [ "${{ needs.build.outputs.artifact_name }}" = *"tee"* ] || [ "${{ github.event.inputs.enable_tee }}" = "true" ] || [ "${{ needs.build.outputs.twrp_branch }}" != "" ]; then
+          
+          # FIX: Independent verification of TEE files
+          if [ "${{ needs.build.outputs.enable_tee }}" = "true" ]; then
             TEE_BINS=$(find . -path "*/vendor/bin/teed" -o -path "*/vendor/bin/tee_check_keybox" | wc -l)
             TEE_TAS=$(find . -path "*/vendor/app/t6/*.ta" | wc -l)
             echo "Independent verify: TEE binaries=$TEE_BINS, trusted apps=$TEE_TAS"
+            [ "$TEE_BINS" -ge 2 ] || { echo "::error::TEE binaries missing in independent verify"; exit 1; }
+            [ "$TEE_TAS" -ge 4 ] || { echo "::error::TEE trusted apps missing in independent verify"; exit 1; }
           fi
           echo "=== INDEPENDENT VERIFY PASSED ==="
 
   release:
     name: Create Release
     needs: [build, verify]
-    if: ${{ github.event.inputs.create_release == true && github.event.inputs.skip_verify != true }}
+    if: ${{ (github.event.inputs.create_release == 'true' || github.event_name == 'push') && github.event.inputs.skip_verify != 'true' }}
     runs-on: ubuntu-22.04
     steps:
       - name: Download Artifact
@@ -431,42 +388,30 @@ jobs:
       - name: Prepare Release
         run: |
           cd release-files
-          mv vendor_boot.img twrp_lxx521_${{ inputs.version }}.img
-          sha256sum twrp_lxx521_${{ inputs.version }}.img > SHA256SUMS
+          mv vendor_boot.img twrp_lxx521_${{ needs.build.outputs.version }}.img
+          sha256sum twrp_lxx521_${{ needs.build.outputs.version }}.img > SHA256SUMS
           ls -lh
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ inputs.version }}
-          name: "TWRP ${{ inputs.version }} - Lava Play Ultra 5G (${{ needs.build.outputs.twrp_branch }})"
+          tag_name: ${{ needs.build.outputs.version }}
+          name: "TWRP ${{ needs.build.outputs.version }} - Lava Play Ultra 5G (LXX521)"
           body: |
-            ## TWRP ${{ inputs.version }} for Lava Play Ultra 5G (LXX521)
+            ## TWRP ${{ needs.build.outputs.version }} for Lava Play Ultra 5G (LXX521)
             
-            **Build Configuration:**
-            - TWRP Base: ${{ needs.build.outputs.twrp_branch }}
-            - TEE Injection: ${{ github.event.inputs.enable_tee || 'true' }}
-            - TEE Activation: ${{ github.event.inputs.tee_activation || 'false' }}
+            **Branch:** `${{ needs.build.outputs.twrp_branch }}`
+            **TEE Enabled:** `${{ needs.build.outputs.enable_tee }}`
+            **TEE Activation:** `${{ needs.build.outputs.tee_activation }}`
             
-            **Flashing Instructions:**
+            ### ⚠️ Critical Warning
+            - Unlocking the bootloader erases all user data.
+            - Keep a backup of your stock `vendor_boot.img` before flashing.
+            
+            ### Installation
+            Flash to `vendor_boot_a` using mtkclient:
             ```bash
-            # Flash to vendor_boot partition
-            mtk w vendor_boot_a twrp_lxx521_${{ inputs.version }}.img
-            mtk reset
+            python mtk.py w vendor_boot_a twrp_lxx521_${{ needs.build.outputs.version }}.img
+            python mtk.py reset
             ```
             
-            **Verification:**
-            ```bash
-            sha256sum -c SHA256SUMS
-            ```
-            
-            **Warning:**
-            - Unofficial recovery. Bootloader unlock may erase data.
-            - Flashing a wrong image can bootloop or brick the device.
-            - Always keep your stock `vendor_boot.img` backup.
-            - Do not flash `preloader`, `nvram`, `nvdata`, `modem`, or `persist`.
-            ${{ github.event.inputs.tee_activation == 'true' && '⚠️ TEE ACTIVATION ENABLED - This replaces init.recovery and may cause bootloops if incompatible!' || '' }}
-          files: |
-            release-files/twrp_lxx521_${{ inputs.version }}.img
-            release-files/SHA256SUMS
-          draft: false
-          prerelease: ${{ contains(inputs.version, 'beta') || contains(inputs.version, 'alpha') || contains(inputs.version, 'rc') }}
+            **Please verify the SHA256 checksum before flashing!**
