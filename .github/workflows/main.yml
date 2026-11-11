@@ -157,6 +157,10 @@ jobs:
           git clone --depth=1 https://github.com/fahimfrk/Dimensity7300-Device-Tree-Lava-Play-Ultra device/lava/lxx521
           # Remove obsolete add_lunch_combo from upstream vendorsetup.sh (use COMMON_LUNCH_CHOICES instead)
           sed -i '/add_lunch_combo/d' device/lava/lxx521/vendorsetup.sh
+          echo "=== vendorsetup.sh after sed ==="
+          cat device/lava/lxx521/vendorsetup.sh
+          echo "=== AndroidProducts.mk ==="
+          cat device/lava/lxx521/AndroidProducts.mk
           # Clone kernel prebuilts
           git clone --depth=1 --branch lineage-23.2 https://github.com/SiliconxLab/android_device_lava_lxx521-kernel device/lava/lxx521-kernel
           # Link kernel prebuilts to device tree prebuilt location
@@ -173,6 +177,9 @@ jobs:
           USE_CCACHE: 1
         run: |
           source build/envsetup.sh
+          echo "=== Available lunch combos ==="
+          lunch 2>&1 | head -30 || true
+          echo "=== Trying twrp_lxx521-eng ==="
           lunch twrp_lxx521-eng
           mka recoveryimage vendorbootimage -j$(nproc)
           find out/ -name "*.img" -exec ls -lh {} \;
