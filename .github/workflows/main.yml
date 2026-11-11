@@ -240,11 +240,12 @@ jobs:
           if [ "$TEE_ACTIVATION" = "true" ]; then
             echo "  TEE ACTIVATION MODE: Using custom init.recovery (stock .rc files NOT copied)"
           else
+            # SAFE MODE WITH DECRYPTION: Copy .rc files WITHOUT .disabled so services can start
             for rc_file in $TEE/etc-init/*.rc; do
               [ -f "$rc_file" ] || continue
               basename_rc=$(basename "$rc_file")
-              cp "$rc_file" "$RAMDISK/vendor/etc/init/${basename_rc}.disabled"
-              echo "  DISABLED: ${basename_rc}.disabled"
+              cp "$rc_file" "$RAMDISK/vendor/etc/init/${basename_rc}"
+              echo "  ENABLED: ${basename_rc} (for decryption)"
             done
           fi
           
@@ -252,11 +253,12 @@ jobs:
           if [ "$TEE_ACTIVATION" = "true" ]; then
             echo "  TEE ACTIVATION MODE: Skipping stock VINTF copy"
           else
+            # SAFE MODE WITH DECRYPTION: Copy VINTF manifests WITHOUT .disabled
             for xml_file in $TEE/etc-vintf/*.xml; do
               [ -f "$xml_file" ] || continue
               basename_xml=$(basename "$xml_file")
-              cp "$xml_file" "$RAMDISK/vendor/etc/vintf/manifest/${basename_xml}.disabled"
-              echo "  DISABLED: ${basename_xml}.disabled"
+              cp "$xml_file" "$RAMDISK/vendor/etc/vintf/manifest/${basename_xml}"
+              echo "  ENABLED: ${basename_xml} (for decryption)"
             done
           fi
           
@@ -280,8 +282,8 @@ jobs:
             echo "TEE ACTIVATION: init.recovery replaced with TEE version"
             echo "New init.recovery size: $(stat -c '%s' "$RAMDISK/init.recovery.mt6878.rc") bytes"
           else
-            echo "SAFE MODE: Using standard init.recovery (TEE services INACTIVE)"
-            echo "TEE files are present but INACTIVE"
+            echo "SAFE MODE WITH DECRYPTION: Using standard init.recovery + TEE services enabled"
+            echo "TEE services (keymint, gatekeeper) will start via vendor init.rc"
           fi
 
       - name: Repack CPIO
