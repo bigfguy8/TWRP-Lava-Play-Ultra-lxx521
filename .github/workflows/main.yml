@@ -183,6 +183,21 @@ jobs:
           sed -i '/add_lunch_combo/d' device/lava/lxx521/vendorsetup.sh
 
           # ============================================================
+          # CI FIX: bootctrl HAL is missing libbase in shared_libs.
+          # At ~97% the recovery variant fails to link with:
+          #   ld.lld: error: undefined symbol: _ZN7android4base9ShouldLogE...
+          # BootControl.cpp includes <android-base/logging.h>, but the module
+          # only lists liblog/libhidlbase/libhardware/libutils. Upstream's
+          # bootctrl.default module lists libbase explicitly.
+          # ============================================================
+          BOOTCTRL_BP=device/lava/lxx521/bootctrl/Android.bp
+          if ! grep -q '"libbase"' "$BOOTCTRL_BP"; then
+            sed -i 's/^\(    shared_libs: \[\)$/\1\n        "libbase",/' "$BOOTCTRL_BP"
+          fi
+          grep -q '"libbase"' "$BOOTCTRL_BP" || { echo "::error::failed to patch $BOOTCTRL_BP"; exit 1; }
+          grep -n '"libbase"' "$BOOTCTRL_BP"
+
+          # ============================================================
           # CI FIX (1/2): disable kernel VINTF requirements.
           # ============================================================
           sed -i 's/^PRODUCT_ENFORCE_VINTF_MANIFEST := true/PRODUCT_ENFORCE_VINTF_MANIFEST := false/' device/lava/lxx521/device.mk
