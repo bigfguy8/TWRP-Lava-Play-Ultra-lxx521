@@ -256,7 +256,7 @@ jobs:
           export ALLOW_MISSING_DEPENDENCIES=true
           source build/envsetup.sh
           
-          LUNCH_TARGET="twrp_lxx521-eng"
+          LUNCH_TARGET="twrp_lxx521-ap2a-eng"
           echo "Trying lunch target: $LUNCH_TARGET"
           lunch $LUNCH_TARGET
           
