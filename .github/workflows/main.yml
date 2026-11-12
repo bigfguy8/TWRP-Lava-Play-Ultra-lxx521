@@ -41,7 +41,10 @@ permissions:
 
 env:
   CCACHE_DIR: /tmp/ccache
-  CCACHE_MAXSIZE: 15G
+  CCACHE_MAXSIZE: 10G
+  # Limit Java memory usage to prevent OOM on 16GB runner
+  _JAVA_OPTIONS: "-Xmx3g"
+  JACK_SERVER_VM_ARGUMENTS: "-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx4g"
 
 jobs:
   build:
@@ -87,10 +90,22 @@ jobs:
             done
           fi
 
-      - name: Free Disk Space
+      - name: Maximize Free Disk Space
         run: |
-          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL 2>/dev/null || true
+          echo "Initial disk space:"
+          df -h /
+          # Remove unnecessary large toolkits pre-installed on GitHub runners
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo rm -rf /usr/local/graalvm
+          sudo rm -rf /usr/local/share/pypy
           sudo apt-get clean
+          docker system prune -a -f
+          echo "Final disk space:"
           df -h /
 
       - name: Setup ccache
@@ -130,44 +145,38 @@ jobs:
           git config --global user.email "actions@github.com"
           echo "Using TWRP branch: ${{ env.TWRP_BRANCH }}"
           repo init -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b "${{ env.TWRP_BRANCH }}" --depth=1
-          repo sync -c -j$(nproc) --force-sync --no-clone-bundle --no-tags --optimized-fetch --prune
+          repo sync -c -j4 --force-sync --no-clone-bundle --no-tags --optimized-fetch --prune
 
       - name: Clone Device Tree & Kernel
         working-directory: workspace
         run: |
-          # Clone device tree
           git clone --depth=1 https://github.com/fahimfrk/Dimensity7300-Device-Tree-Lava-Play-Ultra device/lava/lxx521
-          
-          # Remove obsolete add_lunch_combo from upstream vendorsetup.sh
           sed -i '/add_lunch_combo/d' device/lava/lxx521/vendorsetup.sh
           
-          # Clone kernel prebuilts
           git clone --depth=1 --branch lineage-23.2 https://github.com/SiliconxLab/android_device_lava_lxx521-kernel device/lava/lxx521-kernel
           
-          # Link kernel prebuilts to device tree
           mkdir -p device/lava/lxx521/prebuilt/modules
           cp -r device/lava/lxx521-kernel/modules/* device/lava/lxx521/prebuilt/modules/
           cp device/lava/lxx521-kernel/images/* device/lava/lxx521/prebuilt/ 2>/dev/null || true
-          
           echo "Device tree and kernel prebuilts ready"
 
       - name: Build TWRP
         working-directory: workspace
         env:
           CCACHE_DIR: /tmp/ccache
-          CCACHE_MAXSIZE: 15G
+          CCACHE_MAXSIZE: 10G
           USE_CCACHE: 1
         run: |
           source build/envsetup.sh
           
-          # THE FIX: Android 14+ requires the release name in the lunch combo (ap2a)
+          # Android 14+ requires the release name (ap2a) in the lunch combo
           LUNCH_TARGET="twrp_lxx521-ap2a-eng"
           echo "Trying lunch target: $LUNCH_TARGET"
-          
           lunch $LUNCH_TARGET
           
-          # Start the build
-          mka recoveryimage vendorbootimage -j$(nproc)
+          # FIX: Limit to -j4 to prevent Out Of Memory (OOM) on GitHub's 16GB runners
+          echo "Starting build with -j4..."
+          mka recoveryimage vendorbootimage -j4
           
           echo "=== Built Images ==="
           find out/ -name "*.img" -exec ls -lh {} \;
@@ -213,12 +222,10 @@ jobs:
           mkdir -p $RAMDISK/vendor/etc/init $RAMDISK/vendor/etc/vintf/manifest
           mkdir -p $RAMDISK/vendor/app/t6
           
-          # Cleanup old TEE configs
           rm -f $RAMDISK/vendor/etc/init/trustkernel.rc* 2>/dev/null || true
           rm -f $RAMDISK/vendor/etc/init/android.hardware.security.keymint@*.rc* 2>/dev/null || true
           rm -f $RAMDISK/vendor/etc/init/android.hardware.gatekeeper-service*.rc* 2>/dev/null || true
           
-          # Copy Binaries and Libraries
           cp $TEE/bin/teed $RAMDISK/vendor/bin/
           cp $TEE/bin/tee_check_keybox $RAMDISK/vendor/bin/
           cp $TEE/bin-hw/* $RAMDISK/vendor/bin/hw/
@@ -237,12 +244,10 @@ jobs:
             done
           fi
           
-          # Copy TAs and data
           cp $TEE/app-t6/*.ta $RAMDISK/vendor/app/t6/
           cp $TEE/app-t6/cfg.ini $RAMDISK/vendor/app/t6/
           cp -r $TEE/app-t6/data $RAMDISK/vendor/app/t6/
           
-          # Permissions
           chmod 755 $RAMDISK/vendor/bin/teed $RAMDISK/vendor/bin/tee_check_keybox
           chmod 755 $RAMDISK/vendor/bin/hw/*
           find $RAMDISK/vendor/app/t6/data -type d -exec chmod 0755 {} \; 2>/dev/null || true
