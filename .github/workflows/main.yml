@@ -270,8 +270,9 @@ jobs:
         working-directory: workspace
         id: locate_tools
         run: |
-          UNPACK=$(find . -path "*/mkbootimg/unpack_bootimg.py" | head -1)
-          MKBOOT=$(find . -path "*/mkbootimg/mkbootimg.py" | head -1)
+          # Absolute paths: later steps run from the repo root, not workspace/
+          UNPACK=$(find "$PWD" -path "*/mkbootimg/unpack_bootimg.py" | head -1)
+          MKBOOT=$(find "$PWD" -path "*/mkbootimg/mkbootimg.py" | head -1)
           [ -z "$UNPACK" ] && { echo "::error::unpack_bootimg.py not found"; exit 1; }
           [ -z "$MKBOOT" ] && { echo "::error::mkbootimg.py not found"; exit 1; }
           echo "unpack_tool=$UNPACK" >> $GITHUB_OUTPUT
