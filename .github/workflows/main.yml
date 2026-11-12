@@ -42,9 +42,8 @@ permissions:
 env:
   CCACHE_DIR: /tmp/ccache
   CCACHE_MAXSIZE: 10G
-  # Limit Java memory usage to prevent OOM on 16GB runner
   _JAVA_OPTIONS: "-Xmx3g"
-  JACK_SERVER_VM_ARGUMENTS: "-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx4g"
+  JACK_SERVER_VM_ARGUMENTS: "-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx3g"
 
 jobs:
   build:
@@ -94,7 +93,6 @@ jobs:
         run: |
           echo "Initial disk space:"
           df -h /
-          # Remove unnecessary large toolkits pre-installed on GitHub runners
           sudo rm -rf /usr/share/dotnet
           sudo rm -rf /opt/ghc
           sudo rm -rf "/usr/local/share/boost"
@@ -107,6 +105,17 @@ jobs:
           docker system prune -a -f
           echo "Final disk space:"
           df -h /
+
+      - name: Setup Swap Memory
+        run: |
+          echo "Creating 16GB swap file to prevent OOM Killer..."
+          sudo swapoff -a || true
+          sudo dd if=/dev/zero of=/swapfile bs=1G count=16
+          sudo chmod 600 /swapfile
+          sudo mkswap /swapfile
+          sudo swapon /swapfile
+          echo "Swap memory status:"
+          free -h
 
       - name: Setup ccache
         uses: actions/cache@v4
@@ -145,7 +154,7 @@ jobs:
           git config --global user.email "actions@github.com"
           echo "Using TWRP branch: ${{ env.TWRP_BRANCH }}"
           repo init -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b "${{ env.TWRP_BRANCH }}" --depth=1
-          repo sync -c -j4 --force-sync --no-clone-bundle --no-tags --optimized-fetch --prune
+          repo sync -c -j2 --force-sync --no-clone-bundle --no-tags --optimized-fetch --prune
 
       - name: Clone Device Tree & Kernel
         working-directory: workspace
@@ -169,14 +178,13 @@ jobs:
         run: |
           source build/envsetup.sh
           
-          # Android 14+ requires the release name (ap2a) in the lunch combo
           LUNCH_TARGET="twrp_lxx521-ap2a-eng"
           echo "Trying lunch target: $LUNCH_TARGET"
           lunch $LUNCH_TARGET
           
-          # FIX: Limit to -j4 to prevent Out Of Memory (OOM) on GitHub's 16GB runners
-          echo "Starting build with -j4..."
-          mka recoveryimage vendorbootimage -j4
+          # FIX: Use -j2 to prevent OOM on 16GB runner
+          echo "Starting build with -j2..."
+          mka recoveryimage vendorbootimage -j2
           
           echo "=== Built Images ==="
           find out/ -name "*.img" -exec ls -lh {} \;
