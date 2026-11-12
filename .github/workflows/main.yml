@@ -156,6 +156,23 @@ jobs:
           repo init -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b "${{ env.TWRP_BRANCH }}" --depth=1
           repo sync -c -j2 --force-sync --no-clone-bundle --no-tags --optimized-fetch --prune
 
+      - name: Restore Guava Stripped by Minimal Manifest
+        working-directory: workspace
+        run: |
+          # twrp-14.1/default.xml -> twrp-default.xml -> remove-minimal.xml does
+          #   <remove-project path="external/guava" />
+          # tools/platform-compat's unsupportedappusage-annotation-processor-lib
+          # statically links the "guava" module, so Soong aborts at ~19% with:
+          #   module unsupportedappusage-annotation-processor-lib missing dependencies: guava
+          # Re-add the project at the AOSP tag pinned by the manifest.
+          if [ ! -d external/guava ]; then
+            git clone --depth=1 --branch android-14.0.0_r67 \
+              https://android.googlesource.com/platform/external/guava external/guava
+          fi
+          test -f external/guava/Android.bp
+          echo "external/guava restored"
+          grep -m1 'name: "guava"' external/guava/Android.bp
+
       - name: Clone Device Tree & Kernel
         working-directory: workspace
         run: |
