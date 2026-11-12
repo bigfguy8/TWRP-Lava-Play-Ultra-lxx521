@@ -176,13 +176,15 @@ jobs:
           CCACHE_MAXSIZE: 10G
           USE_CCACHE: 1
         run: |
+          # FIX: Allow missing dependencies (specifically the kernel dependency)
+          export ALLOW_MISSING_DEPENDENCIES=true
+          
           source build/envsetup.sh
           
           LUNCH_TARGET="twrp_lxx521-ap2a-eng"
           echo "Trying lunch target: $LUNCH_TARGET"
           lunch $LUNCH_TARGET
           
-          # FIX: Use -j2 to prevent OOM on 16GB runner
           echo "Starting build with -j2..."
           mka recoveryimage vendorbootimage -j2
           
